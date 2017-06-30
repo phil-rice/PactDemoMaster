@@ -1,0 +1,1 @@
+web:  $EXECUTABLE -- -admin.port=:$PORT -http.port=:$PORT

@@ -1,0 +1,15 @@
+language: scala
+scala:
+- 2.11.8
+jdk:
+- oraclejdk8
+script: sbt ++$TRAVIS_SCALA_VERSION test
+after_success:
+- '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publishLocal publish; };'
+- 'git push https://git.heroku.com/pact-demo-provider.git master'
+- 'git push https://git.heroku.com/pact-demo-android.git master'
+- 'git push  https://git.heroku.com/pact-demo-ios.git master'
+env:
+  global:
+  - secure: Z6k//IMvrVDIhFgiIexYb+i95VZ8vPMx7CHykmgu4a3soBW5ZXP4xlG3kAv94xjyhLG+9qfZMeQ8VD23RTitWlg6LT0GIfTUXx8b+EP6MaVoCTQPxxmnHUuvg1lBh9TYr/FgGY2So6BVmuvjsTNID5bOnJ37wt/5hR1xdhdqunRufLpiZ7tRfigpLX8bUbliTLiAF88YmRDRcqcmBtXTousCgzRbdfXODNw7Rhw/kSlemceqa7nqgyouzw4qySLHmSKXMAw7WBdibklCQl/aXiiq/h6cUeDbedzGG+cO2iRUhvat5ekaOiPLdfTkgi5vzvn/quuDIOqKuNZx8Fmwx6UnyCoGfSJnD03WyZMyVG5Fe7mMM332NugTddCnqm5fXXL3zSUGCk7l1ffKbeBWspH1ISGbbupCBtBwSPfkRu5xUCfr4Jy2vJQEUIDiBzyXszKFhVvlU8TIxGDhzf+vyaewkLlUsLc1vDoQMPHI0iwSDqSZpMfatY92XYeJCnsegvm9C857lN2HzcmPuWVNO1LondmqogtRXdTSnlSpDAfvNShWOc3Ny0o1vfRg41apfVMVZL9JvJrYmpGk3SC1KrwSJInU9CEvuimjeEI3XMo5SW46XN+Y9MGreZpqCuwdQ5NIF3ciSt1eCDbck/qwGlJP06isg4X4TAvaPi033bA=
+  - secure: O5jtOJ9bQw6cIb8GCCmXqZ5dGeUJUQWrvnsiwZ7GCjo48R/4d0+6fe82rAqhzuxDF3YUSUUR9SgZLaGqP4kYiCkrr6p4oeqRGtwvniVbCx/q91DHdPYT2dZNXxd/ZCoGT4zMj8n2hDN6Y3TCuGATthXGDrQc8OA8vWObBZtIOZn4miEFDgdTDVZsheFkwPXMD9u5s2UGrGl6ITsdJ3+8f5rl0aT6e0HYiML0Mz71xcIUudYMWD0ys/dtZnyHmvTRRN4tvuED2cKh85bhkVYX5jduD1y9IpCiJJLaMD/WA21qq42vXhcy4GwYlFSzOGC8sbAoB0BdAq8rXKutOPp6GMH7lJraJoIykftW9fnjIWRlQwsxyNEcHGKwujjKfYPlCwhWaLSpwk4U2QC45KTFwV0FYvHma41bwbD5xtPsdN5t2VQNO5J2g+xQO6zJkYs7VtFPgiYkHgBxINtYN7hw4u1KalQ0M1DhpPlGGpItKTRKaOlqC4ElneS7X6CSIjPbROPX+kbGZRlE6SCcXayhs6d76SLNt5V7Y5MCLBCHybs1iTZQSeDcvOONXkqh24LQlbkhP7p3r5Z4cud+eYur00ddZI9p6EoYVK85of89vszTQlBexwyjGQKE87BSAMYPKwKn0dwC7axhjDY+UjQyZtsxF4QvjIDN8cwCdNqGB2k=

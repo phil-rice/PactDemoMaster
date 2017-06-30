@@ -1,0 +1,12 @@
+git remote add heroku_provider https://git.heroku.com/pact-demo-provider.git
+git remote add heroku_android https://git.heroku.com/pact-demo-android.git
+git remote add heroku_ios https://git.heroku.com/pact-demo-ios.git
+
+
+git push heroku_provider master
+git push heroku_android master
+git push heroku_ios master
+
+git push https://git.heroku.com/pact-demo-provider.git master
+git push https://git.heroku.com/pact-demo-android.git master
+git push https://git.heroku.com/pact-demo-ios.git master
