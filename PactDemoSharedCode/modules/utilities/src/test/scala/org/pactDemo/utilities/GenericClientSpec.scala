@@ -20,7 +20,7 @@ class GenericClientSpec extends PactDemoSpec {
     fn(new GenericCustomClient[Int, String](delegate), delegate, toRequest, fromResponse)
   }
 
-  it should "take the request, use the ToRequest typeclass pass it to the delegate, get the result and transform it with the FromResponse" in {
+  it should "take the request, use the CustomeRequestProcessor typeclass pass it to the delegate, get the result and transform it with the CustomeResponseProcessor" in {
     withMocks { (client, delegate, toRequest, fromResponse) =>
       when(toRequest.apply(1)) thenReturn (someRequest)
       when(delegate.apply(someRequest)) thenReturn Future.value(someResponse)
