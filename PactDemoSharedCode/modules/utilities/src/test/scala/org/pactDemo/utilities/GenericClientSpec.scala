@@ -2,6 +2,7 @@ package org.pactDemo.utilities
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.util.Future
+import org.pactDemo.utilities.Futures._
 
 import org.mockito.Mockito._
 
@@ -12,11 +13,11 @@ class GenericClientSpec extends PactDemoSpec {
   val someRequest = Request("/someRequest")
   val someResponse = Response()
 
-  def withMocks(fn: (GenericHttpClient[Int, String], Request => Future[Response], ToRequest[Int], FromResponse[String]) => Unit) = {
-    implicit val toRequest = mock[ToRequest[Int]]
-    implicit val fromResponse = mock[FromResponse[String]]
+  def withMocks(fn: (GenericCustomClient[Int, String], Request => Future[Response], CustomeRequestProcessor[Int], CustomeResponseProcessor[String]) => Unit) = {
+    implicit val toRequest = mock[CustomeRequestProcessor[Int]]
+    implicit val fromResponse = mock[CustomeResponseProcessor[String]]
     implicit val delegate = mock[Request => Future[Response]]
-    fn(new GenericHttpClient[Int, String](delegate), delegate, toRequest, fromResponse)
+    fn(new GenericCustomClient[Int, String](delegate), delegate, toRequest, fromResponse)
   }
 
   it should "take the request, use the ToRequest typeclass pass it to the delegate, get the result and transform it with the FromResponse" in {
