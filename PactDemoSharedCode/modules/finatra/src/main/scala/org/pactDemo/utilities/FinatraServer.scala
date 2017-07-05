@@ -11,6 +11,7 @@ class FinatraServer(defaultPort: Int, controllers: Controller*) extends HttpServ
 
 
   def actualPort = Heroku.port(defaultPort)
+  println(s"Finatra Server is starting on port $actualPort")
   override val modules = Seq()
 
   override val disableAdminHttpServer = true // see https://twitter.github.io/finatra/user-guide/twitter-server/index.html

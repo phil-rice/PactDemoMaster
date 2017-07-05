@@ -107,11 +107,11 @@ lazy val pactConsumerSettings = finatraSettings ++ Seq(
   libraryDependencies += "com.itv" %% "scalapact-scalatest" % versions.scalapact
 )
 lazy val appUtilities = (project in file("PactDemoSharedCode/modules/utilities")).
- settings(finatraSettings: _*).
- settings(jsonSettings: _*)
- 
+  settings(finatraSettings: _*).
+  settings(jsonSettings: _*)
+
 lazy val finatraUtilities = (project in file("PactDemoSharedCode/modules/finatra")).dependsOn(appUtilities).aggregate(appUtilities).
- settings(finatraSettings: _*)
+  settings(finatraSettings: _*)
 
 lazy val androidApp = (project in file("PactDemoAndroidApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
@@ -119,6 +119,9 @@ lazy val androidApp = (project in file("PactDemoAndroidApp")).dependsOn(appUtili
 lazy val iosApp = (project in file("PactDemoIosApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
-lazy val provider = (project in file("PactDemoProvider")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
-  settings(finatraSettings: _*).enablePlugins(JavaAppPackaging)
+lazy val provider = (project in file("PactDemoProvider")).
+  dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
+  settings(finatraSettings: _*).
+  settings(pactConsumerSettings: _*).
+  enablePlugins(JavaAppPackaging)
 
