@@ -30,7 +30,7 @@ class IosConsumerPact extends FunSpec with Matchers {
           interaction
             .description("Fetching results")
             .given("token '7899-valid-for-id-1-token'  is valid for id 1")
-            .uponReceiving("/token/1")
+            .uponReceiving(method = GET, path = "/token/1", query = None, headers = Map("Authentication" -> "token 7899-valid-for-id-1-token"), body = None, matchingRules = None)
             //add the header
             .willRespondWith(200, """{"token":"valid"}""")
         )
