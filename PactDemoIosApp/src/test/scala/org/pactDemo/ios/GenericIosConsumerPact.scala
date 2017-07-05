@@ -21,8 +21,8 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
         .addInteraction(
           interaction
             .description("Validating valid request result")
-            .uponReceiving("/token/id/1")
-            .willRespondWith(200, """{"id":"998877-valid-token"}""")
+            .given("token '7899-valid-for-id-1-token'  is valid for id 1")
+            .willRespondWith(200, """{"id":"7899-valid-for-id-1-token"}""")
         )
         .runConsumerTest {
           mockConfig =>
@@ -33,16 +33,15 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
         }
     }
 
-
     it("should be able to detect invalid token - passing invalid token") {
       forgePact
-        .between("CustomeAndroid")
+        .between("CustomeIos")
         .and("Provider")
         .addInteraction(
           interaction
             .description("Validating invalid request result")
-            .uponReceiving("/token/id/2")
-            .willRespondWith(200, """{"id":"445566-invalid-token"}""")
+            .given("token '112233-invalid-for-id-2-token' is invalid for id 2")
+            .willRespondWith(200, """{"id":"112233-invalid-for-id-2-token"}""")
         )
         .runConsumerTest {
           mockConfig =>

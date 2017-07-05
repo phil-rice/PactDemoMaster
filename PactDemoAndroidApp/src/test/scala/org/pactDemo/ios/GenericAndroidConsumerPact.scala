@@ -24,8 +24,10 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
         .addInteraction(
           interaction
             .description("Validating valid request result")
-            .uponReceiving("/token/id/1")
-            .willRespondWith(200, """{"id":"112233-valid-token"}""")
+            .given("token '12345-valid-for-id-1-token' is valid for id 1")
+            .uponReceiving(method = GET, path = "/token/id/1", query = None, headers = Map("Authentication" -> "12345-valid-for-id-1-token"), body = None, matchingRules = None)
+            //.uponReceiving("/token/id/1")
+            .willRespondWith(200, """{"id":"12345-valid-for-id-1-token"}""")
         )
         .runConsumerTest {
           mockConfig =>
@@ -43,8 +45,10 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
         .addInteraction(
           interaction
             .description("Validating invalid request result")
-            .uponReceiving("/token/id/2")
-            .willRespondWith(200, """{"id":"445566-invalid-token"}""")
+            .given("token '54321-invalid-for-id-2-token' is valid for id 2")
+            .uponReceiving(method = GET, path = "/token/id/2", query = None, headers = Map("Authentication" -> "54321-invalid-for-id-2-token"), body = None, matchingRules = None)
+            //.uponReceiving("/token/id/2")
+            .willRespondWith(200, """{"id":"54321-invalid-for-id-2-token"}""")
         )
         .runConsumerTest {
           mockConfig =>

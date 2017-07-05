@@ -20,7 +20,9 @@ object AndriodCustomeAuthenticationRequest {
 
   implicit object makeAndriodCustomeRequest extends CustomeRequestProcessor[AndriodCustomeAuthenticationRequest] {
     override def apply(customeRequest: AndriodCustomeAuthenticationRequest): Request = {
-      Request(s"/token/id/${customeRequest.id}")
+      val request = Request(s"/token/id/${customeRequest.id}")
+      request.headerMap.add("Authentication", s"token ${customeRequest.token}")
+      request
     }
   }
 

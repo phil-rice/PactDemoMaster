@@ -20,7 +20,9 @@ object IosCustomeAuthenticationRequest {
 
   implicit object makeIosCustomeRequest extends CustomeRequestProcessor[IosCustomeAuthenticationRequest] {
     override def apply(customeRequest: IosCustomeAuthenticationRequest): Request = {
-      Request(s"/token/id/${customeRequest.id}")
+      val request = Request(s"/token/id/${customeRequest.id}")
+      request.headerMap.add("Authentication", s"token ${customeRequest.token}")
+      request
     }
   }
 
