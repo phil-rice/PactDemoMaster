@@ -22,6 +22,8 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
           interaction
             .description("Validating valid request result")
             .given("token '7899-valid-for-id-1-token'  is valid for id 1")
+            .uponReceiving(method = GET, path = "/token/id/1", query = None, headers = Map("Authentication" -> "token 7899-valid-for-id-1-token"), body = None, matchingRules = None)
+            //.uponReceiving("/token/id/1")
             .willRespondWith(200, """{"id":"7899-valid-for-id-1-token"}""")
         )
         .runConsumerTest {
@@ -41,6 +43,8 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
           interaction
             .description("Validating invalid request result")
             .given("token '112233-invalid-for-id-2-token' is invalid for id 2")
+            .uponReceiving(method = GET, path = "/token/id/2", query = None, headers = Map("Authentication" -> "112233-invalid-for-id-2-token"), body = None, matchingRules = None)
+            //.uponReceiving("/token/id/2")
             .willRespondWith(200, """{"id":"112233-invalid-for-id-2-token"}""")
         )
         .runConsumerTest {
