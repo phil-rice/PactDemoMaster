@@ -37,7 +37,6 @@ class AuthenticationService extends (AuthenticationRequest => Future[Authenticat
 
 trait FromRequest[T] extends (Request => T)
 
-
 trait MakeResponse[T] extends (T => Response)
 
 class ProviderController(authenticationService: AuthenticationService) extends Controller {
