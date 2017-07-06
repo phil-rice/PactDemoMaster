@@ -50,7 +50,7 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
             //.uponReceiving(method = GET, path = "/token/id/2", query = None, headers = Map("Authentication" -> "54321-invalid-for-id-2-token"), body = None, matchingRules = None)
             .uponReceiving(method = POST, path = "/token/id/2", query = None, headers = Map("ContentType" -> "application/hcl.token"), body = """{"Authentication-token":"token 54321-invalid-for-id-2-token"}""", matchingRules = None)
             //.uponReceiving("/token/id/2")
-            .willRespondWith(401, """Unauthorized token 112233-invalid-for-id-2-token""")
+            .willRespondWith(401, """Unauthorized token 54321-invalid-for-id-2-token""")
         )
         .runConsumerTest {
           mockConfig =>
