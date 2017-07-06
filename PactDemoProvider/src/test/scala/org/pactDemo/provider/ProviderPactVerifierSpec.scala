@@ -9,7 +9,7 @@ import org.scalatest.{BeforeAndAfterAll, FlatSpec}
 
 class ProviderPactVerifierSpec extends FlatSpec with BeforeAndAfterAll {
 
-  val server = new EmbeddedHttpServer(new FinatraServer(0, new ProviderController)) //the port is ignored
+  val server = new EmbeddedHttpServer(new FinatraServer(0, new ProviderController(new AuthenticationService))) //the port is ignored
 
   override def beforeAll(): Unit = {
     super.beforeAll()
