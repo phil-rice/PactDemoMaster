@@ -25,15 +25,16 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
           interaction
             .description("Validating valid request result")
             .given("token '12345-valid-for-id-1-token' is valid for id 1")
-            .uponReceiving(method = GET, path = "/token/id/1", query = None, headers = Map("Authentication" -> "12345-valid-for-id-1-token"), body = None, matchingRules = None)
+            //.uponReceiving(method = POST, path = "/token/id/1", query = None, headers = Map("Authentication" -> "12345-valid-for-id-1-token"), body = None, matchingRules = None)
+            .uponReceiving(method = POST, path = "/token/id/1", query = None, headers = Map("ContentType" -> "application/hcl.token"), body = """{"Authentication-token":"token 12345-valid-for-id-1-token"}""", matchingRules = None)
             //.uponReceiving("/token/id/1")
-            .willRespondWith(200, """{"id":"12345-valid-for-id-1-token"}""")
+            .willRespondWith(200, """{"token":"12345-valid-for-id-1-token","id":"1"}""")
         )
         .runConsumerTest {
           mockConfig =>
             val rawHttpClient = Http.newService(mockConfig.host + ":" + mockConfig.port)
             val client = new GenericCustomClient[AndriodCustomeAuthenticationRequest, AndriodCustomeAuthentication](rawHttpClient)
-            val request = AndriodCustomeAuthenticationRequest("1", "valid")
+            val request = AndriodCustomeAuthenticationRequest("1", "12345-valid-for-id-1-token")
             client(request).await shouldBe AndriodCustomeAuthenticationValid
         }
     }
@@ -46,15 +47,16 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
           interaction
             .description("Validating invalid request result")
             .given("token '54321-invalid-for-id-2-token' is valid for id 2")
-            .uponReceiving(method = GET, path = "/token/id/2", query = None, headers = Map("Authentication" -> "54321-invalid-for-id-2-token"), body = None, matchingRules = None)
+            //.uponReceiving(method = GET, path = "/token/id/2", query = None, headers = Map("Authentication" -> "54321-invalid-for-id-2-token"), body = None, matchingRules = None)
+            .uponReceiving(method = POST, path = "/token/id/2", query = None, headers = Map("ContentType" -> "application/hcl.token"), body = """{"Authentication-token":"token 54321-invalid-for-id-2-token"}""", matchingRules = None)
             //.uponReceiving("/token/id/2")
-            .willRespondWith(200, """{"id":"54321-invalid-for-id-2-token"}""")
+            .willRespondWith(401, """Unauthorized token 112233-invalid-for-id-2-token""")
         )
         .runConsumerTest {
           mockConfig =>
             val rawHttpClient = Http.newService(mockConfig.host + ":" + mockConfig.port)
             val client = new GenericCustomClient[AndriodCustomeAuthenticationRequest, AndriodCustomeAuthentication](rawHttpClient)
-            val request = AndriodCustomeAuthenticationRequest("2", "invalid")
+            val request = AndriodCustomeAuthenticationRequest("2", "54321-invalid-for-id-2-token")
             client(request).await shouldBe AndriodCustomeAuthenticationInValid
         }
     }
