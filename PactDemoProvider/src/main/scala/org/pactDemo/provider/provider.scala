@@ -10,14 +10,14 @@ import com.fasterxml.jackson.module.scala._
 
 case class AuthenticationRequestWithPrefixBody(`Authentication-token`: String){
   def copyWithoutPrefix =  `Authentication-token`.split(" ") match {
-    case Array(prefix, token) => token
-    case Array(token) => token
+    case Array(prefix, token) => AuthenticationRequestWithPrefixBody( token )
+    case Array(token) => AuthenticationRequestWithPrefixBody( token )
   }
 }
 
 case class AuthenticationRequestBody(`Authentication-token`: String)
 
-trait FromJsonToObject[From, To] extends (From => To)
+trait FromJsonToObject[From, To] extends ( From => To )
 
 object AuthenticationRequestBody {
 
@@ -29,33 +29,28 @@ object AuthenticationRequestBody {
       mapper.readValue(body.contentString, classOf[AuthenticationRequestBody])
     }
   }
-
 }
 
-trait GetActualToken[T] extends (T => T)
+trait GetActualToken[T, B] extends ( T => B )
 
-object GetActualToken {
+object GetActualToken extends PactArrow {
 
-  implicit object GetActualTokenForAuthenticationRequestBody extends GetActualToken[AuthenticationRequestBody] {
-    override def apply(requestBody: AuthenticationRequestBody): AuthenticationRequestBody = {
-      requestBody.`Authentication-token`.split(" ").length == 2 match {
-        case true => AuthenticationRequestBody(requestBody.`Authentication-token`.split(" ")(1))
-        case false => AuthenticationRequestBody(requestBody.`Authentication-token`.split(" ")(0))
-      }
+  implicit object GetActualTokenForAuthenticationRequestBody extends GetActualToken[AuthenticationRequestBody, AuthenticationRequestWithPrefixBody] {
+    override def apply(requestBody: AuthenticationRequestBody): AuthenticationRequestWithPrefixBody = {
+      ( requestBody.`Authentication-token` ) ~> ( AuthenticationRequestWithPrefixBody( _ ) ) ~> ( _.copyWithoutPrefix )
     }
   }
-
 }
 
 object AuthenticationRequest extends PactArrow {
   val fromJson = implicitly[FromJsonToObject[Request, AuthenticationRequestBody]]
-  val GetActualToken = implicitly[GetActualToken[AuthenticationRequestBody]]
+  val GetActualToken = implicitly[GetActualToken[AuthenticationRequestBody, AuthenticationRequestWithPrefixBody]]
 
   implicit object FromJsonForAuthenticationRequest extends FromRequest[AuthenticationRequest] {
-    override def apply(request: Request): AuthenticationRequest =
-      request ~> fromJson ~> GetActualToken ~> (_.`Authentication-token`) ~> (s => AuthenticationRequest(request.getIntParam("id"), s))
+    override def apply(request: Request): AuthenticationRequest ={
+      request ~> fromJson ~> GetActualToken ~> ( _.`Authentication-token` )~> ( AuthenticationRequest( request.getIntParam( "id" ), _  ) )
+    }
   }
-
 }
 
 case class AuthenticationRequest(id: Int, token: String)
