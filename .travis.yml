@@ -10,6 +10,7 @@ after_success:
 - 'git push https://git.heroku.com/pact-demo-provider.git master'
 - 'git push https://git.heroku.com/pact-demo-android.git master'
 - 'git push  https://git.heroku.com/pact-demo-ios.git master'
+- 'chmod 777 Upload_pacts.sh'
 - './Upload_pacts.sh'
 env:
   global:
