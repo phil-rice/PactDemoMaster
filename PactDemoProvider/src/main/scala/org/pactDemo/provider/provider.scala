@@ -1,24 +1,47 @@
 package org.pactDemo.provider
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
-import org.pactDemo.utilities.FinatraServer
+import org.pactDemo.utilities.{FinatraServer, PactArrow}
+import com.fasterxml.jackson.module.scala._
 
 
-object AuthenticationRequest {
 
-  implicit object FromJsonForAuthenticationRequest extends FromRequest[AuthenticationRequest] {
-    override def apply(request: Request): AuthenticationRequest = {
-      val id = request.getIntParam("id")
-      val token = request.contentString
-      val index = token.indexOf("-token")
-      val lastIndex = token.indexOf("}")
-      val actualToken = token.substring(index + 15, lastIndex - 1)
-      AuthenticationRequest(id, actualToken)
+case class AuthenticationRequestBody( `Authentication-token` : String )
+trait FromJsonToObject[From, To] extends ( From => To )
+object AuthenticationRequestBody{
+
+  val mapper = new ObjectMapper()
+  mapper.registerModule( DefaultScalaModule )
+
+  implicit object FromJsonToObjectRequestBody extends FromJsonToObject[Request, AuthenticationRequestBody] {
+    override def apply( body : Request): AuthenticationRequestBody = {
+      mapper.readValue(body.contentString, classOf[AuthenticationRequestBody])
     }
   }
+}
 
+trait GetActualToken[T] extends (T => T)
+object GetActualToken{
+  implicit object GetActualTokenForAuthenticationRequestBody extends GetActualToken[ AuthenticationRequestBody ] {
+    override def apply( requestBody : AuthenticationRequestBody): AuthenticationRequestBody = {
+      requestBody.`Authentication-token`.split( " " ).length == 2 match{
+        case true => AuthenticationRequestBody( requestBody.`Authentication-token`.split( " " )(1) )
+        case false => AuthenticationRequestBody( requestBody.`Authentication-token`.split( " " )(0) )
+      }
+    }
+  }
+}
+
+object AuthenticationRequest extends PactArrow{
+  val fromJson = implicitly[FromJsonToObject[Request,AuthenticationRequestBody]]
+  val GetActualToken = implicitly[GetActualToken[AuthenticationRequestBody]]
+
+  implicit object FromJsonForAuthenticationRequest extends FromRequest[AuthenticationRequest] {
+    override def apply(request: Request): AuthenticationRequest =  AuthenticationRequest( request.getIntParam("id"), (request ~> fromJson ~> GetActualToken).`Authentication-token` )
+  }
 }
 
 case class AuthenticationRequest(id: Int, token: String)
@@ -39,7 +62,7 @@ trait FromRequest[T] extends (Request => T)
 
 trait MakeResponse[T] extends (T => Response)
 
-class ProviderController(authenticationService: AuthenticationService) extends Controller {
+class ProviderController(authenticationService: AuthenticationService) extends Controller with PactArrow{
 
   implicit object MakeResponseForAuthenticationResult extends MakeResponse[AuthenticationResult] {
     override def apply(v1: AuthenticationResult): Response = v1 match {
@@ -47,18 +70,8 @@ class ProviderController(authenticationService: AuthenticationService) extends C
       case ValidResponse(id, token) => response.ok(s"""{"token":"$token","id":"$id"}""")
     }
   }
-
   val fromRequest = implicitly[FromRequest[AuthenticationRequest]]
   val makeResponse = implicitly[MakeResponse[AuthenticationResult]]
-
-  implicit class AnyPimper[T](t: T) {
-    def ~>[T1](fn: T => T1) = fn(t)
-  }
-
-  implicit class FuturePimper[T](t: Future[T]) {
-    def ~>[T1](fn: T => T1) = t.map(fn)
-  }
-
 
   post("/token/id/:id") { request: Request => request ~> fromRequest ~> authenticationService ~> makeResponse }
 }

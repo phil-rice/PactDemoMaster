@@ -1,7 +1,5 @@
 package org.pactDemo.provider
 
-import java.nio.file.Paths
-
 import com.itv.scalapact.ScalaPactVerify._
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.pactDemo.utilities.FinatraServer
