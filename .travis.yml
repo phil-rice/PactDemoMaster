@@ -5,16 +5,12 @@ jdk:
 - oraclejdk8
 script: sbt ++$TRAVIS_SCALA_VERSION test
 after_success:
- - "curl -X PUT https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomeIos/version/1.0.0 -H 'authorization: Basic aGxIUGZjdzl4TGxLT2g2ZDMxWkZlTDM3dE14azFtVzpFZWlRQTN4b1RZM2ZFZmpmOTRPMzZ6YVdYc3JuYUda' \
-     -H 'cache-control: no-cache' \
-     -H 'content-type: application/json' \
-     -H 'postman-token: daba02ed-2c00-befe-cdc5-4917366286c9' \
-     -d @target/pacts/CustomeIos_Provider.json"
 - 'echo "https://hclscalatraining:$GIT_PASS@git.heroku.com/pact-demo-provider.git\nhttps://hclscalatraining:$GIT_PASS@git.heroku.com/pact-demo-android.git\nhttps://hclscalatraining:$GIT_PASS@git.heroku.com/pact-demo-ios.git" >> ~/.gitcredentials'
 - '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publishLocal publish; };'
 - 'git push https://git.heroku.com/pact-demo-provider.git master'
 - 'git push https://git.heroku.com/pact-demo-android.git master'
 - 'git push  https://git.heroku.com/pact-demo-ios.git master'
+- 'curl -X PUT https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomeIos/version/1.0.0 -H "authorization: Basic aGxIUGZjdzl4TGxLT2g2ZDMxWkZlTDM3dE14azFtVzpFZWlRQTN4b1RZM2ZFZmpmOTRPMzZ6YVdYc3JuYUda" -H "cache-control: no-cache" -H "content-type: application/json" -d @target/pacts/CustomeIos_Provider.json'
 env:
   global:
   - secure: Z6k//IMvrVDIhFgiIexYb+i95VZ8vPMx7CHykmgu4a3soBW5ZXP4xlG3kAv94xjyhLG+9qfZMeQ8VD23RTitWlg6LT0GIfTUXx8b+EP6MaVoCTQPxxmnHUuvg1lBh9TYr/FgGY2So6BVmuvjsTNID5bOnJ37wt/5hR1xdhdqunRufLpiZ7tRfigpLX8bUbliTLiAF88YmRDRcqcmBtXTousCgzRbdfXODNw7Rhw/kSlemceqa7nqgyouzw4qySLHmSKXMAw7WBdibklCQl/aXiiq/h6cUeDbedzGG+cO2iRUhvat5ekaOiPLdfTkgi5vzvn/quuDIOqKuNZx8Fmwx6UnyCoGfSJnD03WyZMyVG5Fe7mMM332NugTddCnqm5fXXL3zSUGCk7l1ffKbeBWspH1ISGbbupCBtBwSPfkRu5xUCfr4Jy2vJQEUIDiBzyXszKFhVvlU8TIxGDhzf+vyaewkLlUsLc1vDoQMPHI0iwSDqSZpMfatY92XYeJCnsegvm9C857lN2HzcmPuWVNO1LondmqogtRXdTSnlSpDAfvNShWOc3Ny0o1vfRg41apfVMVZL9JvJrYmpGk3SC1KrwSJInU9CEvuimjeEI3XMo5SW46XN+Y9MGreZpqCuwdQ5NIF3ciSt1eCDbck/qwGlJP06isg4X4TAvaPi033bA=
