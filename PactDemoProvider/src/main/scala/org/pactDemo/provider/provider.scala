@@ -8,40 +8,54 @@ import org.pactDemo.utilities.{FinatraServer, PactArrow}
 import com.fasterxml.jackson.module.scala._
 
 
+case class AuthenticationRequestWithPrefixBody(`Authentication-token`: String){
+  def copyWithoutPrefix =  `Authentication-token`.split(" ") match {
+    case Array(prefix, token) => token
+    case Array(token) => token
+  }
+}
 
-case class AuthenticationRequestBody( `Authentication-token` : String )
-trait FromJsonToObject[From, To] extends ( From => To )
-object AuthenticationRequestBody{
+case class AuthenticationRequestBody(`Authentication-token`: String)
+
+trait FromJsonToObject[From, To] extends (From => To)
+
+object AuthenticationRequestBody {
 
   val mapper = new ObjectMapper()
-  mapper.registerModule( DefaultScalaModule )
+  mapper.registerModule(DefaultScalaModule)
 
   implicit object FromJsonToObjectRequestBody extends FromJsonToObject[Request, AuthenticationRequestBody] {
-    override def apply( body : Request): AuthenticationRequestBody = {
+    override def apply(body: Request): AuthenticationRequestBody = {
       mapper.readValue(body.contentString, classOf[AuthenticationRequestBody])
     }
   }
+
 }
 
 trait GetActualToken[T] extends (T => T)
-object GetActualToken{
-  implicit object GetActualTokenForAuthenticationRequestBody extends GetActualToken[ AuthenticationRequestBody ] {
-    override def apply( requestBody : AuthenticationRequestBody): AuthenticationRequestBody = {
-      requestBody.`Authentication-token`.split( " " ).length == 2 match{
-        case true => AuthenticationRequestBody( requestBody.`Authentication-token`.split( " " )(1) )
-        case false => AuthenticationRequestBody( requestBody.`Authentication-token`.split( " " )(0) )
+
+object GetActualToken {
+
+  implicit object GetActualTokenForAuthenticationRequestBody extends GetActualToken[AuthenticationRequestBody] {
+    override def apply(requestBody: AuthenticationRequestBody): AuthenticationRequestBody = {
+      requestBody.`Authentication-token`.split(" ").length == 2 match {
+        case true => AuthenticationRequestBody(requestBody.`Authentication-token`.split(" ")(1))
+        case false => AuthenticationRequestBody(requestBody.`Authentication-token`.split(" ")(0))
       }
     }
   }
+
 }
 
-object AuthenticationRequest extends PactArrow{
-  val fromJson = implicitly[FromJsonToObject[Request,AuthenticationRequestBody]]
+object AuthenticationRequest extends PactArrow {
+  val fromJson = implicitly[FromJsonToObject[Request, AuthenticationRequestBody]]
   val GetActualToken = implicitly[GetActualToken[AuthenticationRequestBody]]
 
   implicit object FromJsonForAuthenticationRequest extends FromRequest[AuthenticationRequest] {
-    override def apply(request: Request): AuthenticationRequest =  AuthenticationRequest( request.getIntParam("id"), (request ~> fromJson ~> GetActualToken).`Authentication-token` )
+    override def apply(request: Request): AuthenticationRequest =
+      request ~> fromJson ~> GetActualToken ~> (_.`Authentication-token`) ~> (s => AuthenticationRequest(request.getIntParam("id"), s))
   }
+
 }
 
 case class AuthenticationRequest(id: Int, token: String)
@@ -62,7 +76,7 @@ trait FromRequest[T] extends (Request => T)
 
 trait MakeResponse[T] extends (T => Response)
 
-class ProviderController(authenticationService: AuthenticationService) extends Controller with PactArrow{
+class ProviderController(authenticationService: AuthenticationService) extends Controller with PactArrow {
 
   implicit object MakeResponseForAuthenticationResult extends MakeResponse[AuthenticationResult] {
     override def apply(v1: AuthenticationResult): Response = v1 match {
@@ -70,6 +84,7 @@ class ProviderController(authenticationService: AuthenticationService) extends C
       case ValidResponse(id, token) => response.ok(s"""{"token":"$token","id":"$id"}""")
     }
   }
+
   val fromRequest = implicitly[FromRequest[AuthenticationRequest]]
   val makeResponse = implicitly[MakeResponse[AuthenticationResult]]
 
