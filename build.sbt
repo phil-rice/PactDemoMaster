@@ -120,7 +120,7 @@ lazy val iosApp = (project in file("PactDemoIosApp")).dependsOn(appUtilities, fi
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
 lazy val provider = (project in file("PactDemoProvider")).
-  dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(finatraSettings: _*).
   settings(pactConsumerSettings: _*).
   enablePlugins(JavaAppPackaging)
