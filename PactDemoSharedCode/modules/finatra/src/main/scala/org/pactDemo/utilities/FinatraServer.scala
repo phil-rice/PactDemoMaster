@@ -1,5 +1,7 @@
 package org.pactDemo.utilities
 
+import com.twitter.finagle.http.filter.Cors
+import com.twitter.finagle.http.filter.Cors.HttpFilter
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.{Controller, HttpServer}
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
@@ -22,6 +24,7 @@ class FinatraServer(defaultPort: Int, controllers: Controller*) extends HttpServ
 
   override def configureHttp(router: HttpRouter): Unit = {
     val raw = router.filter[CommonFilters]
+      .filter( new HttpFilter( Cors.UnsafePermissivePolicy ) ) // Added CORS dependency to handle Cross-origin problem
     controllers.foldLeft(raw)((acc, c) => acc.add(c))
   }
 }
