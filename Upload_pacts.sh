@@ -3,6 +3,14 @@
 export username=$1
 export password=$2
 
+echo ''
+echo ''
+echo $username
+echo ''
+echo $password
+echo ''
+echo ''
+
 # #####################################
 #	Delete All Existing PACT files
 # #####################################
