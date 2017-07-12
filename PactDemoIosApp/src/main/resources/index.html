@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Pact Angular Client</title>
+		<!--script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"> </script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-resource.min.js"></script>-->
+		 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.1/angular.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.1/angular-route.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.1/angular-animate.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.1/angular-resource.min.js"></script>
+		<script src="PostConsumerDynamic.js"></script>
+	</head>
+	<body ng-app="demo">
+		<div ng-controller="PactConsumer">
+			<div>
+				POST_ID : <input ng-model="postid"> </input><br/>
+				Auth Token : <input ng-model="authToken" ></input><br/>
+				<input type="button" value="Send" ng-click="postdata(postid,authToken)" /> <br/><br/>
+			</div>
+			<p>Output Message : {{msg}}</p>
+			<p>StatusCode: {{statusval}}</p>
+			<p>Status: {{statustext}}</p>
+			<p>Response Headers: {{headers}}</p>
+		</div>
+	</body>
+</html
