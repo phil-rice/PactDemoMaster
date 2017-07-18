@@ -16,6 +16,7 @@ val versions = new {
   val mockito = "1.10.19"
   val scalatest = "3.0.1"
   val scalapact = "2.1.3"
+  val akka = "2.5.3"
 }
 lazy val commonSettings = Seq(
   version := "1.0",
@@ -26,7 +27,8 @@ lazy val commonSettings = Seq(
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
-    "Twitter Maven" at "https://maven.twttr.com"
+    "Twitter Maven" at "https://maven.twttr.com",
+    "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases"
   ),
   scriptClasspath := Seq("*"), // workaround for windows. https://github.com/sbt/sbt-native-packager/issues/72
   {
@@ -106,9 +108,15 @@ lazy val jsonSettings = Seq(
 lazy val pactConsumerSettings = finatraSettings ++ Seq(
   libraryDependencies += "com.itv" %% "scalapact-scalatest" % versions.scalapact
 )
+
+lazy val akkaSettings = Seq(
+  libraryDependencies += "com.typesafe.akka" %% "akka-actor" % versions.akka
+)
+
 lazy val appUtilities = (project in file("PactDemoSharedCode/modules/utilities")).
   settings(finatraSettings: _*).
-  settings(jsonSettings: _*)
+  settings(jsonSettings: _*).
+  settings(akkaSettings: _*)
 
 lazy val finatraUtilities = (project in file("PactDemoSharedCode/modules/finatra")).dependsOn(appUtilities).aggregate(appUtilities).
   settings(finatraSettings: _*)
@@ -116,12 +124,17 @@ lazy val finatraUtilities = (project in file("PactDemoSharedCode/modules/finatra
 lazy val androidApp = (project in file("PactDemoAndroidApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
+lazy val akkaApp = (project in file("PactDemoAkkaApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
+  settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
+
 lazy val iosApp = (project in file("PactDemoIosApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
+lazy val angularIOApp = (project in file("PactDemoAngularIOApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
+  settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
+  
 lazy val provider = (project in file("PactDemoProvider")).
   dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(finatraSettings: _*).
   settings(pactConsumerSettings: _*).
   enablePlugins(JavaAppPackaging)
-
