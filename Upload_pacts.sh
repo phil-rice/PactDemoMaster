@@ -3,17 +3,6 @@
 export username=$1
 export password=$2
 
-echo ''
-echo ''
-echo $username
-echo ''
-echo $password
-echo ''
-echo ''
-echo " Username - $PACT_BROKER_USERNAME  password - $PACT_BROKER_PASSWORD"\
-
-echo  " Username - $PACT_BROKER_USERNAME  password - $PACT_BROKER_PASSWORD" | sed -e 's/\(.\)/\1\n/g'
-
 # #####################################
 #	Delete All Existing PACT files
 # #####################################
