@@ -24,7 +24,7 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
             .given("token '7899-valid-for-id-1-token'  is valid for id 1")
             .uponReceiving(method = POST, path = "/token/id/1", query = None, headers = Map("ContentType" -> "application/hcl.token"), body = """{"Authentication-token":"token 7899-valid-for-id-1-token"}""", matchingRules = None)
             //.uponReceiving("/token/id/1")
-            .willRespondWith(200, """{"token":"7899-valid-for-id-1-token", "id":"1"}""")
+            .willRespondWith(200, """{"token":"7899-valid-for-id-1-token", "id":"1", "valid": true}""")
         )
         .runConsumerTest {
           mockConfig =>
@@ -37,7 +37,7 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
 
     it("should be able to detect invalid token - passing invalid token") {
       forgePact
-        .between("CustomeIos")
+        .between("CustomerIos")
         .and("Provider")
         .addInteraction(
           interaction

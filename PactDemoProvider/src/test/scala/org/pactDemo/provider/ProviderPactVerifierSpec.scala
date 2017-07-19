@@ -23,14 +23,14 @@ class ProviderPactVerifierSpec extends FlatSpec with BeforeAndAfterAll {
 
   it should "Meet its pacts with Android" in {
     verifyPact
-      .withPactSource(loadFromLocal("target/pacts/CustomeAndroid_Provider.json"))
+      .withPactSource(loadFromLocal("target/pacts/CustomerAndroid_Provider.json"))
       .noSetupRequired // We did the setup in the beforeAll() function
       .runVerificationAgainst("localhost", server.httpExternalPort)
   }
 
   it should "Meet its pacts with IOS" in {
     verifyPact
-      .withPactSource(loadFromLocal("target/pacts/CustomeIos_Provider.json"))
+      .withPactSource(loadFromLocal("target/pacts/CustomerIos_Provider.json"))
       .noSetupRequired // We did the setup in the beforeAll() function
       .runVerificationAgainst("localhost", server.httpExternalPort)
   }

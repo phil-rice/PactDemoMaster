@@ -2,14 +2,16 @@ package org.pactDemo.utilities
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.util.Future
+import sun.awt.EventQueueDelegate.Delegate
 
 /**
   * Created by aban.m on 04-07-2017.
   */
 
 trait CustomeRequestProcessor[CustomRequest] extends (CustomRequest => Request)
-
 trait CustomeResponseProcessor[CustomResponse] extends (Response => CustomResponse)
+
+
 
 class GenericCustomClient[CustomRequest, CustomResponse](delegate: Request => Future[Response])
                                                         (implicit fromRequest: CustomeRequestProcessor[CustomRequest],

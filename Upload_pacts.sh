@@ -25,7 +25,7 @@ curl -X PUT \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
   -u $username:$password \
-  -d @./target/pacts/CustomeIos_Provider.json
+  -d @./target/pacts/CustomerIos_Provider.json
 
 
 curl -X PUT \
@@ -33,4 +33,4 @@ curl -X PUT \
     -H 'cache-control: no-cache' \
     -H 'content-type: application/json' \
     -u $username:$password \
-    -d @./target/pacts/CustomeAndroid_Provider.json
+    -d @./target/pacts/CustomerAndroid_Provider.json

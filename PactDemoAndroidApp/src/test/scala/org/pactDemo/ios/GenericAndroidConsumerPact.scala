@@ -41,7 +41,7 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
 
     it("should be able to detect invalid token - passing invalid token") {
       forgePact
-        .between("CustomeAndroid")
+        .between("CustomerAndroid")
         .and("Provider")
         .addInteraction(
           interaction

@@ -76,7 +76,7 @@ class ProviderController(authenticationService: AuthenticationService) extends C
   implicit object MakeResponseForAuthenticationResult extends MakeResponse[AuthenticationResult] {
     override def apply(v1: AuthenticationResult): Response = v1 match {
       case InvalidResponse(token) => response.unauthorized(s"Unauthorized token $token")
-      case ValidResponse(id, token) => response.ok(s"""{"token":"$token","id":"$id"}""")
+      case ValidResponse(id, token) => response.ok(s"""{"token":"$token","id":"$id", "valid": true}""")
     }
   }
 
