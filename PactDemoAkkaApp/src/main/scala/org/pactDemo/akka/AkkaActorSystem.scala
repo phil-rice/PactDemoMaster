@@ -19,9 +19,7 @@ case object closingProcess
 
 case class RespondeCode(code: Int)
 
-object Util {
-  def currentTime: String = new SimpleDateFormat("dd-MMM-yy hh:mm:ss a").format(Calendar.getInstance.getTime)
-}
+
 
 class AkkaActorSystem extends Actor {
   override def receive: Receive = {
