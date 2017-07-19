@@ -10,6 +10,7 @@ after_success:
 - 'git push https://git.heroku.com/pact-demo-provider.git master'
 - 'git push https://git.heroku.com/pact-demo-android.git master'
 - 'git push  https://git.heroku.com/pact-demo-ios.git master'
+- 'echo " Username - $PACT_BROKER_USERNAME  password - $PACT_BROKER_PASSWORD" '
 - 'sh Upload_pacts.sh  $PACT_BROKER_USERNAME  $PACT_BROKER_PASSWORD'
 env:
   global:
