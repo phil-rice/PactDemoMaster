@@ -16,7 +16,7 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
 
     it("should be able to detect valid token - passing valid token") {
       forgePact
-        .between("CustomeIos")
+        .between("CustomerIos")
         .and("Provider")
         .addInteraction(
           interaction

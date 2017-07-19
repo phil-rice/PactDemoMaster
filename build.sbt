@@ -121,6 +121,7 @@ lazy val appUtilities = (project in file("PactDemoSharedCode/modules/utilities")
 lazy val finatraUtilities = (project in file("PactDemoSharedCode/modules/finatra")).dependsOn(appUtilities).aggregate(appUtilities).
   settings(finatraSettings: _*)
 
+
 lazy val androidApp = (project in file("PactDemoAndroidApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 

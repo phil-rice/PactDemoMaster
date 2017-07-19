@@ -19,7 +19,7 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
 
     it("should be able to detect valid token - passing valid token") {
       forgePact
-        .between("CustomeAndroid")
+        .between("CustomerAndroid")
         .and("Provider")
         .addInteraction(
           interaction
@@ -28,7 +28,7 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
             //.uponReceiving(method = POST, path = "/token/id/1", query = None, headers = Map("Authentication" -> "12345-valid-for-id-1-token"), body = None, matchingRules = None)
             .uponReceiving(method = POST, path = "/token/id/1", query = None, headers = Map("ContentType" -> "application/hcl.token"), body = """{"Authentication-token":"token 12345-valid-for-id-1-token"}""", matchingRules = None)
             //.uponReceiving("/token/id/1")
-            .willRespondWith(200, """{"token":"12345-valid-for-id-1-token","id":"1"}""")
+            .willRespondWith(200, """{"token":"12345-valid-for-id-1-token","id":"1", "valid": true}""")
         )
         .runConsumerTest {
           mockConfig =>
