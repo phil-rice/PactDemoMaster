@@ -34,4 +34,11 @@ class ProviderPactVerifierSpec extends FlatSpec with BeforeAndAfterAll {
       .noSetupRequired // We did the setup in the beforeAll() function
       .runVerificationAgainst("localhost", server.httpExternalPort)
   }
+
+  it should "Meet its pacts with Angular" in {
+    verifyPact
+      .withPactSource(loadFromLocal("target/pacts/AngularIOConsumer_Provider.json"))
+      .noSetupRequired // We did the setup in the beforeAll() function
+      .runVerificationAgainst("localhost", server.httpExternalPort)
+  }
 }
