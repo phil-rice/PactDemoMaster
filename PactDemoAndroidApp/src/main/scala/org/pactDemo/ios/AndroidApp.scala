@@ -2,6 +2,7 @@ package org.pactDemo.ios
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
+import com.twitter.finatra.http.filters.ExceptionMappingFilter
 import com.twitter.finatra.request.RouteParam
 import org.pactDemo.utilities.{FinatraClient, FinatraServer, Heroku}
 
@@ -12,9 +13,11 @@ class AndroidAppController extends Controller {
   val client = new FinatraClient(Heroku.providerHost, Heroku.providerPort, _.replace("}", ""","server":"android"}"""))
   get("/token/id/:id") { request: AndroidRequest =>
     client(request.id).map(response.ok(_).contentType("application/json"))
+
+
   }
 
-  post("/token/id/:id"){ request : Request => Response }
+  post("/token/id/:id"){ request : Request => response }
 }
 
 object IosApp extends App {

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Method, Request, Response}
-
+import com.twitter.util.Future
 import org.pactDemo.utilities.{CustomeRequestProcessor, CustomeResponseProcessor, GenericCustomClient, PactArrow}
 
 
@@ -33,7 +33,6 @@ object StringToObject {
   }
 
 }
-
 
 case class CustomRequestObject(id: Int, token: String)
 
@@ -91,16 +90,16 @@ class CustomRequestProcessActor(restClient: GenericCustomClient[CustomRequestObj
   override def receive: Receive = {
     case CustomRequest(request) =>
 
-      /*restClient(request).onSuccess(println(_))
-      val g = restClient(request).onFailure(println(_))
-      g*/
-
       val pureResponse = restClient(request)
 
-      println(pureResponse)
+      pureResponse.onSuccess(x=> println( x +  " / Success") ) //map(println(_))
 
-      //val convert = implicitly[CustomeResponseProcessor[CustomReplyObject]]
-      //val custResponse = pureResponse ~> convert
+      pureResponse.onFailure(_.printStackTrace())
+
+
+      Thread.sleep(5000)
+
+      println("\n\n" + pureResponse.isInstanceOf[Future[CustomReplyObject]] + "\n\n")
 
       pureResponse
 
