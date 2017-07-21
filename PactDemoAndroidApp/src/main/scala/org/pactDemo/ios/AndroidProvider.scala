@@ -2,7 +2,10 @@ package org.pactDemo.ios
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
+import com.twitter.finatra.request.RouteParam
 import org.pactDemo.utilities._
+
+case class AndroidRequest(@RouteParam id: Int)
 
 class AndroidProviderController extends Controller with PactArrow {
 
@@ -15,9 +18,9 @@ class AndroidProviderController extends Controller with PactArrow {
   implicit object customObjectToResponse extends ObjectConvertor[CustomReplyObject, Response] {
     override def apply(input: CustomReplyObject): Response = {
       input.valid match {
-        case true => response.ok(s"""{"token":"${input.id}","id":"${input.token}", "valid": ${input.valid}, "server":"android"}""")
-        case false => response.ok(s"""{"token":"${input.id}","id":"${input.token}", "valid": ${input.valid}, "server":"android"}""") // response.unauthorized(s"Unauthorized token ${input.id} for id ${input.token}")
-        case _ => response.unauthorized(s"Unknown/Invalid token ${input.id} for id ${input.token}")
+        case true => response.ok(s"""{"id": ${input.id},"token":"${input.token}", "valid": ${input.valid}, "server":"android"}""")
+        case false => response.ok(s"""{"id": ${input.id},"token":"${input.token}", "valid": ${input.valid}, "server":"android"}""") // response.unauthorized(s"Unauthorized token ${input.id} for id ${input.token}")
+        case _ => response.unauthorized(s"Unknown/Invalid token ${input.token} for id ${input.id}")
       }
     }
   }
