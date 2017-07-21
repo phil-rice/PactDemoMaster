@@ -14,6 +14,8 @@ import org.pactDemo.utilities.{CustomeRequestProcessor, CustomeResponseProcessor
 
 object Util {
   def currentTime: String = new SimpleDateFormat("dd-MMM-yy hh:mm:ss a").format(Calendar.getInstance.getTime)
+
+  def getMapper: ObjectMapper = new ObjectMapper().registerModule(DefaultScalaModule)
 }
 
 case class ProcessRequest(input: String)
@@ -25,11 +27,8 @@ trait StringToObject[String, T] extends (String => T)
 object StringToObject {
 
   implicit object makeObject extends StringToObject[String, CustomRequestObject] {
-    val mapper = new ObjectMapper()
-    mapper.registerModule(DefaultScalaModule)
-
     override def apply(input: String): CustomRequestObject = {
-      mapper.readValue(input, classOf[CustomRequestObject])
+      Util.getMapper.readValue(input, classOf[CustomRequestObject])
     }
   }
 
@@ -53,41 +52,14 @@ object CustomRequestObject {
 
 }
 
-
-//"""{"token":"12345-valid-for-id-1-token","id":"1", "valid": true,"server":"android"}"""
-case class DummyObj(id: Int, token: String, valid: Boolean, server: String)
-
-object DummyObj {
-
-  implicit object makeObject extends StringToObject[String, DummyObj] {
-    val mapper = new ObjectMapper()
-    mapper.registerModule(DefaultScalaModule)
-
-    override def apply(input: String): DummyObj = {
-      mapper.readValue(input, classOf[DummyObj])
-    }
-  }
-
-}
-
 case class CustomReplyObject(id: Int, token: String, valid: Boolean, server: String)
 
 object CustomReplyObject {
 
   implicit object makeCustomResponse extends CustomeResponseProcessor[CustomReplyObject] with PactArrow {
     override def apply(response: Response): CustomReplyObject = {
-
       println(s"\n response.contentString : ${response.contentString}\n")
-
-      val convert = implicitly[StringToObject[String, DummyObj]]
-      val dummyObj = response.contentString ~> convert
-
-      CustomReplyObject(dummyObj.id, dummyObj.token, dummyObj.valid, dummyObj.server)
-
-      /*response.contentString.contains("invalid") match {
-        case true => response.contentString ~> convert//CustomReplyObject(2,"54321-invalid-for-id-2-token",false)
-        case false => response.contentString ~> convert//CustomReplyObject(1,"12345-valid-for-id-1-token",true)
-      }*/
+      Util.getMapper.readValue(response.contentString, classOf[CustomReplyObject])
     }
   }
 
@@ -103,10 +75,6 @@ class AkkaPactSystem(restClient: GenericCustomClient[CustomRequestObject, Custom
 
       val convert = implicitly[StringToObject[String, CustomRequestObject]]
       val inputRequest = input ~> convert
-
-      // val cusToReq = implicitly[CustomeRequestProcessor[CustomRequestObject]]
-      // val req = input ~> cusToReq
-      // val inputRequest = input ~> convert //~> customToRequest
 
       val requestProcessor: ActorRef = context.actorOf(Props(new CustomRequestProcessActor(restClient)), s"${inputRequest.id}-Processor")
       requestProcessor ! CustomRequest(inputRequest)
@@ -127,7 +95,14 @@ class CustomRequestProcessActor(restClient: GenericCustomClient[CustomRequestObj
       val g = restClient(request).onFailure(println(_))
       g*/
 
-      restClient(request)
+      val pureResponse = restClient(request)
+
+      println(pureResponse)
+
+      //val convert = implicitly[CustomeResponseProcessor[CustomReplyObject]]
+      //val custResponse = pureResponse ~> convert
+
+      pureResponse
 
     //def client: CustomRequestObject => Future[CustomReplyObject]
     //string - CustomRequestObject - Request - > Response - CustomReplyObject
