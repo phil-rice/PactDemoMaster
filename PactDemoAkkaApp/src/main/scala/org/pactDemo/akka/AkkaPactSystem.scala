@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Method, Request, Response}
-import com.twitter.util.Future
 import org.pactDemo.utilities.{CustomeRequestProcessor, CustomeResponseProcessor, GenericCustomClient, PactArrow}
 
 
