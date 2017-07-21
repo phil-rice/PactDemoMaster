@@ -40,11 +40,10 @@ object CustomRequestObject {
 
   implicit object makeRequest extends CustomeRequestProcessor[CustomRequestObject] {
     override def apply(custObject: CustomRequestObject): Request = {
-      print(s"\n\n id: ${custObject.id}, token: ${custObject.token} \n\n")
-      val request = Request(s"/token/id/${custObject.id}")
+      val request = Request(s"/token/android/post")
       request.headerMap.add("ContentType", "application/hcl.token")
       request.method = Method.Post
-      request.setContentString(s"""{"Authentication-token":"token ${custObject.token}"}""")
+      request.setContentString(s"""{"id": "${custObject.id}", "token":"${custObject.token}"}""")
       request
     }
   }
@@ -63,7 +62,6 @@ object CustomReplyObject {
   }
 
 }
-
 
 case class CustomRequest(param: CustomRequestObject)
 
@@ -92,19 +90,11 @@ class CustomRequestProcessActor(restClient: GenericCustomClient[CustomRequestObj
 
       val pureResponse = restClient(request)
 
-      pureResponse.onSuccess(x=> println( x +  " / Success") ) //map(println(_))
+      pureResponse.onSuccess(println(_)) //onSuccess(x=> println( x +  " / Success") ) //map(println(_))
 
       pureResponse.onFailure(_.printStackTrace())
-
-
       Thread.sleep(5000)
-
-      println("\n\n" + pureResponse.isInstanceOf[Future[CustomReplyObject]] + "\n\n")
-
       pureResponse
-
-    //def client: CustomRequestObject => Future[CustomReplyObject]
-    //string - CustomRequestObject - Request - > Response - CustomReplyObject
 
     case _ => println("None - valid")
   }
@@ -129,7 +119,7 @@ object AkkaPactSystem {
 
   def main(args: Array[String]): Unit = {
     val host = "localhost"
-    val port = "9020"
+    val port = "9090"
     akkaProcessing(host, port)
   }
 

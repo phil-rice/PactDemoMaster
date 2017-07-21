@@ -22,7 +22,7 @@ class AkkaPactTest extends FunSpec with Matchers {
           interaction
             .description("Validating valid request result")
             .given("token '12345-valid-for-id-1-token' is valid for id 1")
-            .uponReceiving(method = POST, path = "/token/id/1", query = None, headers = Map("ContentType" -> "application/hcl.token"), body = """{"Authentication-token":"token 12345-valid-for-id-1-token"}""", matchingRules = None)
+            .uponReceiving(method = POST, path = "/token/android/post", query = None, headers = Map("ContentType" -> "application/hcl.token"), body = """{"id": "1", "token":"12345-valid-for-id-1-token"}""", matchingRules = None)
             .willRespondWith(200, """{"token":"12345-valid-for-id-1-token","id":"1", "valid": true,"server":"android"}""")
         )
         .runConsumerTest {
@@ -42,7 +42,7 @@ class AkkaPactTest extends FunSpec with Matchers {
           interaction
             .description("Validating invalid request result")
             .given("token '54321-invalid-for-id-2-token' is valid for id 2")
-            .uponReceiving(method = POST, path = "/token/id/2", query = None, headers = Map("ContentType" -> "application/hcl.token"), body = """{"Authentication-token":"token 54321-invalid-for-id-2-token"}""", matchingRules = None)
+            .uponReceiving(method = POST, path = "/token/android/post", query = None, headers = Map("ContentType" -> "application/hcl.token"), body = """{"id": "2", "token":"54321-invalid-for-id-2-token"}""", matchingRules = None)
             //.willRespondWith(401, """Unauthorized token 54321-invalid-for-id-2-token""")
             .willRespondWith(401, """{"token":"54321-invalid-for-id-2-token","id":"2", "valid": false,"server":"android"}""")
 
