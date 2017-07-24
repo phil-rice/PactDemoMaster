@@ -18,9 +18,8 @@ class AndroidProviderController extends Controller with PactArrow {
   implicit object customObjectToResponse extends ObjectConvertor[CustomReplyObject, Response] {
     override def apply(input: CustomReplyObject): Response = {
       input.valid match {
-        case true => response.ok(s"""{"id": ${input.id},"token":"${input.token}", "valid": ${input.valid}, "server":"android"}""")
-        case false => response.ok(s"""{"id": ${input.id},"token":"${input.token}", "valid": ${input.valid}, "server":"android"}""") // response.unauthorized(s"Unauthorized token ${input.id} for id ${input.token}")
-        case _ => response.unauthorized(s"Unknown/Invalid token ${input.token} for id ${input.id}")
+        case true => response.ok(s"""{"id": ${input.id},"token":"${input.token}", "valid": ${input.valid}}""")  //, "server":"android"
+        case false => response.ok(s"""{"id": ${input.id},"token":"${input.token}", "valid": ${input.valid}}""") // response.unauthorized(s"Unauthorized token ${input.id} for id ${input.token}") // , "server":"android"
       }
     }
   }

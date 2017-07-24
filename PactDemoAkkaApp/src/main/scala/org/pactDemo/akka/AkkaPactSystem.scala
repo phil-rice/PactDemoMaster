@@ -4,11 +4,18 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.util.Timeout
+import akka.pattern.ask
+
+import scala.concurrent.duration._
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Method, Request, Response}
+import com.twitter.util.Future
 import org.pactDemo.utilities.{CustomeRequestProcessor, CustomeResponseProcessor, GenericCustomClient, PactArrow}
+
+import scala.concurrent.Await
 
 
 object Util {
@@ -49,13 +56,13 @@ object CustomRequestObject {
 
 }
 
-case class CustomReplyObject(id: Int, token: String, valid: Boolean, server: String)
+case class CustomReplyObject(id: Int, token: String, valid: Boolean) //, server: String
 
 object CustomReplyObject {
 
   implicit object makeCustomResponse extends CustomeResponseProcessor[CustomReplyObject] with PactArrow {
     override def apply(response: Response): CustomReplyObject = {
-      println(s"\n response.contentString : ${response.contentString}\n")
+      //println(s"\n response.contentString : ${response.contentString}\n")
       Util.getMapper.readValue(response.contentString, classOf[CustomReplyObject])
     }
   }
@@ -73,6 +80,7 @@ class AkkaPactSystem(restClient: GenericCustomClient[CustomRequestObject, Custom
       val inputRequest = input ~> convert
 
       val requestProcessor: ActorRef = context.actorOf(Props(new CustomRequestProcessActor(restClient)), s"${inputRequest.id}-Processor")
+
       requestProcessor ! CustomRequest(inputRequest)
     }
 
@@ -89,11 +97,12 @@ class CustomRequestProcessActor(restClient: GenericCustomClient[CustomRequestObj
 
       val pureResponse = restClient(request)
 
-      pureResponse.onSuccess(println(_)) //onSuccess(x=> println( x +  " / Success") ) //map(println(_))
+     // val returnVal : Future[CustomReplyObject] = pureResponse.map(x => x )// onSuccess(println(_))
+     // returnVal
 
-      pureResponse.onFailure(_.printStackTrace())
-      Thread.sleep(5000)
-      pureResponse
+      pureResponse.onSuccess(println(_))
+
+      Thread.sleep(500)
 
     case _ => println("None - valid")
   }
@@ -112,7 +121,14 @@ object AkkaPactSystem {
     mainProcess ! ProcessRequest("""{"id": 1, "token":"12345-valid-for-id-1-token"}""")
     mainProcess ! ProcessRequest("""{"id": 2, "token":"54321-invalid-for-id-2-token"}""")
 
-    Thread.sleep(50)
+
+  //  implicit val timeout = Timeout(5 seconds)
+  //  val future = mainProcess ? ProcessRequest("""{"id": 1, "token":"12345-valid-for-id-1-token"}""") // enabled by the “ask” import
+  //  val result = Await.result(future, timeout.duration).asInstanceOf[Future[CustomReplyObject]]
+
+  //  result.onSuccess(println(_))
+
+    Thread.sleep(5)
     mainProcess ! closeProcess
   }
 
