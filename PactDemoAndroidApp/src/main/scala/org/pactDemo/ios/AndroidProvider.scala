@@ -9,11 +9,8 @@ case class AndroidRequest(@RouteParam id: Int)
 
 class AndroidProviderController extends Controller with PactArrow {
 
-  val client = new FinatraClient(Heroku.providerHost, Heroku.providerPort, _.replace("}", ""","server":"android"}"""))
+//  val client = new FinatraClient(Heroku.providerHost, Heroku.providerPort, _.replace("}", ""","server":"android"}"""))
 
-  get("/token/id/:id") { request: AndroidRequest =>
-    client(request.id).map(response.ok(_).contentType("application/json"))
-  }
 
   implicit object customObjectToResponse extends ObjectConvertor[CustomReplyObject, Response] {
     override def apply(input: CustomReplyObject): Response = {
@@ -27,7 +24,8 @@ class AndroidProviderController extends Controller with PactArrow {
   val requestToCustomObjectConverter = implicitly[ToCustomObject[Request, CustomRequestObject]]
   val objectToCustomResponseConverter = implicitly[ObjectConvertor[CustomRequestObject, CustomReplyObject]]
 
-  post("/token/android/post") { request: Request => request ~> requestToCustomObjectConverter ~> objectToCustomResponseConverter ~> customObjectToResponse }
+  post("/token/android/post") { request: Request =>
+    request ~> requestToCustomObjectConverter ~> objectToCustomResponseConverter ~> customObjectToResponse }
   options("/token/android/post") { request: Request => response.ok }
 }
 
