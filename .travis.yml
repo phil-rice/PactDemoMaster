@@ -7,9 +7,6 @@ script: sbt ++$TRAVIS_SCALA_VERSION pactTest
 after_success:
 - 'echo "https://hclscalatraining:$GIT_PASS@git.heroku.com/pact-demo-provider.git\nhttps://hclscalatraining:$GIT_PASS@git.heroku.com/pact-demo-android.git\nhttps://hclscalatraining:$GIT_PASS@git.heroku.com/pact-demo-ios.git" >> ~/.gitcredentials'
 - '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publishLocal publish; };'
-- 'git push https://git.heroku.com/pact-demo-provider.git master'
-- 'git push https://git.heroku.com/pact-demo-android.git master'
-- 'git push  https://git.heroku.com/pact-demo-ios.git master'
 - 'echo " Username - $PACT_BROKER_USERNAME  password - $PACT_BROKER_PASSWORD" '
 - 'sh Upload_pacts.sh  $PACT_BROKER_USERNAME  $PACT_BROKER_PASSWORD'
 - 'sh pushToHeroku.sh'
