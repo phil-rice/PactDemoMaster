@@ -6,7 +6,7 @@ setup_git() {
   git remote remove heroku_provider
   git remote remove heroku_android
   git remote remove heroku_ios
-  git remote add heroku_provider https://ignored:/${HEROKU_API_KEY}@git.heroku.com/pact-demo-provider.git
+  git remote add heroku_provider https://ignored:${HEROKU_API_KEY}@git.heroku.com/pact-demo-provider.git
   git remote add heroku_android https://ignored:${HEROKU_API_KEY}@git.heroku.com/pact-demo-android.git
   git remote add heroku_ios https://ignored:${HEROKU_API_KEY}@git.heroku.com/pact-demo-ios.git
 }
