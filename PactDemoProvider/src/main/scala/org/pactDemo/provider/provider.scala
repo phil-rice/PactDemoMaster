@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.scala._
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
-import org.pactDemo.utilities.{FinatraServer, PactArrow}
+import org.pactDemo.utilities.{AssetsController, FinatraServer, PactArrow}
 
 
 case class AuthenticationRequestWithPrefixBody(`Authentication-token`: String){
@@ -90,5 +90,5 @@ class ProviderController(authenticationService: AuthenticationService) extends C
 
 
 object Provider extends App {
-  new FinatraServer(9000, new ProviderController(new AuthenticationService)).main(Array())
+  new FinatraServer(9000, new ProviderController(new AuthenticationService), new AssetsController).main(Array())
 }

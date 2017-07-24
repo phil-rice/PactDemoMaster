@@ -31,5 +31,5 @@ class AndroidProviderController extends Controller with PactArrow {
 
 
 object AndroidIOApp extends App {
-  new FinatraServer(9090, new AndroidProviderController()).main(Array())
+  new FinatraServer(9090, new AndroidProviderController(), new AssetsController).main(Array())
 }

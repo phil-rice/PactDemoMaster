@@ -17,6 +17,7 @@ val versions = new {
   val scalatest = "3.0.1"
   val scalapact = "2.1.3"
   val akka = "2.5.3"
+  val scalate = "1.8.0"
 }
 lazy val commonSettings = Seq(
   version := "1.0",
@@ -80,6 +81,9 @@ lazy val commonSettings = Seq(
   publishArtifact in Test := false
 )
 
+lazy val mustacheSettings = commonSettings ++ Seq(
+  libraryDependencies += "org.scalatra.scalate" % "scalate-core_2.11" % versions.scalate
+)
 
 lazy val finatraSettings = commonSettings ++ Seq(
   libraryDependencies += "com.twitter" %% "finatra-http" % versions.finatra,
@@ -133,7 +137,7 @@ lazy val iosApp = (project in file("PactDemoIosApp")).dependsOn(appUtilities, fi
 
 lazy val angularIOApp = (project in file("PactDemoAngularIOApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
-  
+
 lazy val provider = (project in file("PactDemoProvider")).
   dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(finatraSettings: _*).

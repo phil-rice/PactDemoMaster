@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
-import org.pactDemo.utilities.{FinatraServer, PactArrow}
+import org.pactDemo.utilities.{AssetsController, FinatraServer, PactArrow}
 
 /**
   * Created by prasenjit.b on 7/11/2017.
@@ -88,5 +88,5 @@ class IosProvider() extends Controller with PactArrow{
 }
 
 object IosProvider extends App{
-  new FinatraServer( 9030, new IosProvider).main( Array() )
+  new FinatraServer( 9030, new IosProvider, new AssetsController).main( Array() )
 }
