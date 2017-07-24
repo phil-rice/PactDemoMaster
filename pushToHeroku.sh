@@ -11,7 +11,6 @@ setup_git() {
   git remote add heroku_ios https://ignored:${HEROKU_API_KEY}@git.heroku.com/pact-demo-ios.git
 }
 
-
 upload_files() {
   git push --force heroku_provider master
   git push --force heroku_android master
