@@ -117,6 +117,10 @@ lazy val akkaSettings = Seq(
   libraryDependencies += "com.typesafe.akka" %% "akka-actor" % versions.akka
 )
 
+lazy val javaPactSettings = Seq(
+  libraryDependencies += "au.com.dius" % "pact-jvm-consumer-junit_2.11" % "3.5.1" % "test"
+)
+
 lazy val appUtilities = (project in file("PactDemoSharedCode/modules/utilities")).
   settings(finatraSettings: _*).
   settings(jsonSettings: _*).
@@ -125,6 +129,10 @@ lazy val appUtilities = (project in file("PactDemoSharedCode/modules/utilities")
 lazy val finatraUtilities = (project in file("PactDemoSharedCode/modules/finatra")).dependsOn(appUtilities).aggregate(appUtilities).
   settings(finatraSettings: _*)
 
+lazy val javaAndroidApp = (project in file("PactDemoJavaAndroidConsumer")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
+  settings(finatraSettings: _*).
+  settings(javaPactSettings: _*).
+  enablePlugins(JavaAppPackaging)
 
 lazy val androidApp = (project in file("PactDemoAndroidApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
