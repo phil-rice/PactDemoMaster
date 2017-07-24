@@ -6,7 +6,7 @@
             var token = document.getElementById("token").value
             console.log("Customer Id is ", customerId)
             console.log("token  ", token)
-            var url = "/token/android/post
+            var url = "/token/android/post"
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 ) {
@@ -14,7 +14,7 @@
                 }
             };
             xhttp.open("POST", url, true);
-            var json = '{"Authentication-token":"token ' + token + '"}'
+            var json = '{"id":"' + customerId + '","token":"' + token + '"}'
             xhttp.send(json);
         }
 
