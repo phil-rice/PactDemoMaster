@@ -16,7 +16,7 @@ upload_files() {
   git push --force heroku_provider master
   git push --force heroku_android master
   git push --force heroku_ios master
-}|
+}
 
 setup_git
 upload_files
