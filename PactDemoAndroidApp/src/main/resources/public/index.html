@@ -9,22 +9,26 @@
             var url = "/token/android/post"
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
-                if (this.readyState == 4 ) {
+                if (this.readyState == 4) {
                     callback(this);
                 }
             };
             xhttp.open("POST", url, true);
             var json = '{"id":"' + customerId + '","token":"' + token + '"}'
             xhttp.send(json);
+            document.getElementById("sent").innerHTML = json;
         }
 
-        function callback(xhttp) {
-            document.getElementById("demo").innerHTML = xhttp.status + " " +xhttp.responseText;
+        function callback( xhttp) {
+            document.getElementById("result").innerHTML = xhttp.status + "<br />" + xhttp.responseText;
         }
     </script>
 </head>
 <body>
 
+<h1>This is the 'Android' test page</h1>
+<p>Given an id and a token we can send them to the android application and it will send them to the core provider
+    service and determine if they are a valid pair</p>
 <table>
     <tr>
         <th>Id</th>
@@ -38,6 +42,9 @@
         <th><input type="submit" onclick="postIt();"/></th>
     </tr>
 </table>
-<div id="demo"> </div>
+<h2>Sent message: </h2>
+<div id="sent">Nothing sent yet</div>
+<h2>Received message: </h2>
+<div id="result">Nothing received yet</div>
 </body>
 </html>

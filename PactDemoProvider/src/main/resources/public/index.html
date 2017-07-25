@@ -14,16 +14,18 @@
             xhttp.open("POST", url, true);
             var token = document.getElementById("token").value
             var json = '{"Authentication-token":"token ' + token + '"}'
+            document.getElementById("sent").innerHTML = json
             xhttp.send(json);
         }
 
         function callback(xhttp) {
-            document.getElementById("demo").innerHTML = xhttp.status + " " +xhttp.responseText;
+            document.getElementById("result").innerHTML = xhttp.status + " " +xhttp.responseText;
         }
     </script>
 </head>
 <body>
-
+<h1>This is the 'Provider' test page</h1>
+<p>Given an id and a token this is the service that determines if they are a valid pair</p>
 <table>
     <tr>
         <th>Id</th>
@@ -37,6 +39,9 @@
         <th><input type="submit" onclick="postIt();"/></th>
     </tr>
 </table>
-<div id="demo"> </div>
+<h2>Sent message: </h2>
+<div id="sent">Nothing sent yet</div>
+<h2>Received message: </h2>
+<div id="result">Nothing received yet</div>
 </body>
 </html>
