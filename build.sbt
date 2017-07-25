@@ -119,7 +119,9 @@ lazy val akkaSettings = Seq(
 )
 
 lazy val javaPactSettings = Seq(
-  libraryDependencies += "au.com.dius" % "pact-jvm-consumer-junit_2.11" % versions.javapact % "test"
+  libraryDependencies += "au.com.dius" % "pact-jvm-consumer-junit_2.11" % versions.javapact % "test",
+  libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
+  crossPaths := false
 )
 
 lazy val appUtilities = (project in file("PactDemoSharedCode/modules/utilities")).
