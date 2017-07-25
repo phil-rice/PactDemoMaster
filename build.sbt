@@ -18,6 +18,7 @@ val versions = new {
   val scalapact = "2.1.3"
   val akka = "2.5.3"
   val scalate = "1.8.0"
+  val javapact = "3.5.1"
 }
 lazy val commonSettings = Seq(
   version := "1.0",
@@ -118,7 +119,7 @@ lazy val akkaSettings = Seq(
 )
 
 lazy val javaPactSettings = Seq(
-  libraryDependencies += "au.com.dius" % "pact-jvm-consumer-junit_2.11" % "3.5.1" % "test"
+  libraryDependencies += "au.com.dius" % "pact-jvm-consumer-junit_2.11" % versions.javapact % "test"
 )
 
 lazy val appUtilities = (project in file("PactDemoSharedCode/modules/utilities")).
