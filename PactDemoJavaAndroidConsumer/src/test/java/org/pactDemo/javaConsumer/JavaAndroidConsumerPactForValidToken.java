@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Created by prasenjit.b on 7/20/2017.
  */
-public class JavaAndroidConsumerPact extends ConsumerPactTestMk2 {
+public class JavaAndroidConsumerPactForValidToken extends ConsumerPactTestMk2 {
 
     @Rule
     public PactProviderRuleMk2 mockProvider = new PactProviderRuleMk2("AndriodProvider", "localhost", 9090, this );
@@ -31,7 +31,6 @@ public class JavaAndroidConsumerPact extends ConsumerPactTestMk2 {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("ContentType","application/hcl.token");
         return builder
-                .given("token '112233-invalid-for-id-2-token' is invalid for id 2")
                 .uponReceiving("JavaAndriodPact Test interaction 1")
                 .path("/token/android/post")
                 .method("POST")
@@ -39,14 +38,6 @@ public class JavaAndroidConsumerPact extends ConsumerPactTestMk2 {
                 .willRespondWith()
                 .status(200)
                 .body("{\"id\":1,\"token\":\"token invalid\",\"valid\": false}")
-                .given("token '112233-valid-for-id-1-token' is invalid for id 1")
-                .uponReceiving("JavaAndriodPact Test interaction 2")
-                .path("/token/android/post")
-                .method("POST")
-                .body("{\"id\":1,\"token\":\"token valid\"}","application/hcl.token")
-                .willRespondWith()
-                .status(200)
-                .body("{\"id\": 1,\"token\":\"token valid\", \"valid\": true}")
                 .toPact();
     }
 
@@ -57,11 +48,11 @@ public class JavaAndroidConsumerPact extends ConsumerPactTestMk2 {
 
     @Override
     protected String consumerName() {
-        return "JavaAndroidConsumer";
+        return "JavaAndroidConsumerForValidToken";
     }
 
     @Override
-    @PactVerification( "JavaAndroidConsumerPact" )
+    @PactVerification( "JavaAndroidConsumerPact1" )
     public void runTest( MockServer mockServer ) throws IOException {
         String url = mockServer.getUrl()+"/token/android/post";
         System.out.println("url1 => "+url);
@@ -69,10 +60,5 @@ public class JavaAndroidConsumerPact extends ConsumerPactTestMk2 {
         String postBody ="{\"id\":2,\"token\":\"token invalid\"}";
         String contentType = "application/hcl.token";
         Assert.assertEquals( "{\"id\":1,\"token\":\"token invalid\",\"valid\":false}", new CustomURLConnection().callURL( url, methodName,postBody,contentType ) );
-
-        url = mockServer.getUrl()+"/token/android/post";
-        System.out.println("url2 => "+url);
-        postBody = "{\"id\":1,\"token\":\"token valid\"}";
-        Assert.assertEquals( "{\"id\":1,\"token\":\"token valid\",\"valid\":true}", new CustomURLConnection().callURL( url, methodName,postBody,contentType ) );
     }
 }
