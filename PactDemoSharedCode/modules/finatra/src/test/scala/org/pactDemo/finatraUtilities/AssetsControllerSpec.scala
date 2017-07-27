@@ -38,12 +38,6 @@ class AssetsControllerSpec extends PactDemoSpec with BeforeAndAfterAll with Befo
     ).contentType shouldBe Some("text/html")
   }
 
-  it should "return contents of files with prefix assets from  '/public' with no content type" in {
-    server.httpGet(
-      path = "/assets/index,html",
-      andExpect = Status.Ok,
-      withBody = """IndexHtmlForTest"""
-    ).contentType shouldBe None
-  }
+
 
 }
