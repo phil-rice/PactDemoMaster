@@ -2,18 +2,27 @@ package org.pactDemo.utilities
 
 class StringsSpec extends PactDemoSpec {
 
-  behavior of "Strings.removeFirstWordCheckingEquals"
+  behavior of "Strings.removeStart"
 
   it should "throw an exception if the first word is not present" in {
-    intercept[FirstWordNotPresent](Strings.removeFirstWordCheckingEquals("first")("someStuff")) shouldBe FirstWordNotPresent("first", "someStuff")
-    intercept[FirstWordNotPresent](Strings.removeFirstWordCheckingEquals("first")("")) shouldBe FirstWordNotPresent("first", "")
+    intercept[StartNotPresentException](Strings.removeStart("first")("someStuff")) shouldBe StartNotPresentException("first", "someStuff")
+    intercept[StartNotPresentException](Strings.removeStart("first")("")) shouldBe StartNotPresentException("first", "")
   }
-   it should "remove the first word if present" in {
-     Strings.removeFirstWordCheckingEquals("start")("start") shouldBe ""
-     Strings.removeFirstWordCheckingEquals("start")("start") shouldBe ""
-     Strings.removeFirstWordCheckingEquals("start")("start value") shouldBe "value"
-     Strings.removeFirstWordCheckingEquals("start")("start value1 value2") shouldBe "value1 value2"
-   }
+  it should "remove the first word if present" in {
+    Strings.removeStart("start")("start") shouldBe ""
+    Strings.removeStart("start")("start") shouldBe ""
+    Strings.removeStart("start")("start value") shouldBe " value"
+    Strings.removeStart("start ")("start value1 value2") shouldBe "value1 value2"
+  }
+  behavior of "Strings.lastSegmentof"
+
+  it should "return the last segment " in {
+    Strings.lastSegmentOf("") shouldBe ""
+    Strings.lastSegmentOf("/") shouldBe ""
+    Strings.lastSegmentOf("/one") shouldBe "one"
+    Strings.lastSegmentOf("a/b/c/d/ef") shouldBe "ef"
+    Strings.lastSegmentOf("a/b/c/d/") shouldBe "d"
+  }
 
 }
 

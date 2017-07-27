@@ -2,7 +2,7 @@ package org.pactDemo.provider
 
 import com.itv.scalapact.ScalaPactVerify._
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.pactDemo.utilities.FinatraServer
+import org.pactDemo.finatraUtilities.FinatraServer
 import org.scalatest.{BeforeAndAfterAll, FlatSpec}
 
 class ProviderPactVerifierSpec extends FlatSpec with BeforeAndAfterAll {

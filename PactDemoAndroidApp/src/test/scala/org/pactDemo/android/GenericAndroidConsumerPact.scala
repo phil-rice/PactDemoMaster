@@ -1,11 +1,11 @@
-package org.pactDemo.ios
+package org.pactDemo.android
 
-import org.pactDemo.utilities.GenericCustomClient
 import com.twitter.finagle.Http
 import com.twitter.util.{Await, Future}
-import org.pactDemo.utilities.FinatraClient
+import org.pactDemo.android.{IdAndToken, IdTokenAndValid}
+import org.pactDemo.finatraUtilities.GenericCustomClient
 import org.scalatest.{FunSpec, Matchers}
-import org.pactDemo.utilities.Futures._
+import org.pactDemo.finatraUtilities.Futures._
 
 /**
   * Created by aban.m on 04-07-2017.
@@ -33,9 +33,9 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
         .runConsumerTest {
           mockConfig =>
             val rawHttpClient = Http.newService(mockConfig.host + ":" + mockConfig.port)
-            val client = new GenericCustomClient[AndriodCustomeAuthenticationRequest, AndriodCustomeAuthentication](rawHttpClient)
-            val request = AndriodCustomeAuthenticationRequest("1", "12345-valid-for-id-1-token")
-            client(request).await shouldBe AndriodCustomeAuthenticationValid
+            val client = new GenericCustomClient[IdAndToken, IdTokenAndValid](rawHttpClient)
+            val request = IdAndToken(1, "12345-valid-for-id-1-token")
+            client(request).await shouldBe IdTokenAndValid(1, "12345-valid-for-id-1-token", true)
         }
     }
 
@@ -55,9 +55,9 @@ class GenericAndroidConsumerPact extends FunSpec with Matchers {
         .runConsumerTest {
           mockConfig =>
             val rawHttpClient = Http.newService(mockConfig.host + ":" + mockConfig.port)
-            val client = new GenericCustomClient[AndriodCustomeAuthenticationRequest, AndriodCustomeAuthentication](rawHttpClient)
-            val request = AndriodCustomeAuthenticationRequest("2", "54321-invalid-for-id-2-token")
-            client(request).await shouldBe AndriodCustomeAuthenticationInValid
+            val client = new GenericCustomClient[IdAndToken, IdTokenAndValid](rawHttpClient)
+            val request = IdAndToken(2, "54321-invalid-for-id-2-token")
+            client(request).await shouldBe IdTokenAndValid(2, "54321-invalid-for-id-2-token", false)
         }
     }
 

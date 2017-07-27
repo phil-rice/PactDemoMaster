@@ -2,15 +2,17 @@ package org.pactDemo.ios
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.pactDemo.utilities.FinatraServer
-import org.scalatest.{BeforeAndAfterAll, FlatSpec}
+import com.twitter.util.Future
+import org.pactDemo.finatraUtilities.FinatraServer
+import org.pactDemo.utilities.PactDemoSpec
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FlatSpec}
 
-/**
-  * Created by prasenjit.b on 7/11/2017.
-  */
-class IosProviderSpec extends FlatSpec with BeforeAndAfterAll{
+import org.mockito.Mockito._
 
-  val server = new EmbeddedHttpServer(new FinatraServer(0, new IosProvider())) //the port is ignored
+class IosProviderSpec extends PactDemoSpec with BeforeAndAfterAll with BeforeAndAfter {
+
+  val fakeProvider = mock[IosProviderRequest => Future[IosAuthResponse]]
+  val server = new EmbeddedHttpServer(new FinatraServer(0, new IosProvider(fakeProvider))) //the port is ignored
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -22,8 +24,13 @@ class IosProviderSpec extends FlatSpec with BeforeAndAfterAll{
     super.afterAll()
   }
 
+  before {
+    reset(fakeProvider)
+  }
+
   behavior of "IosProvider"
-  it should "Meet its response for IosProvider for Success scenario" in{
+  it should "Make its response for IosProvider for Success scenario" in {
+    when(fakeProvider.apply(IosProviderRequest(1, "valid"))) thenReturn Future.value(IosValidAuthResponse(1, "valid"))
     server.httpPost(
       path = "/token/id/1",
       postBody = """{"Authentication-token":"token valid"}""",
@@ -32,12 +39,13 @@ class IosProviderSpec extends FlatSpec with BeforeAndAfterAll{
     )
   }
 
-  it should "Meet its response for IosProvider for Failure scenario" in{
+  it should "Make its response for IosProvider for Failure scenario" in {
+    when(fakeProvider.apply(IosProviderRequest(2, "invalid"))) thenReturn Future.value(IosValidAuthResponse(2, "invalid"))
     server.httpPost(
       path = "/token/id/2",
       postBody = """{"Authentication-token":"token invalid"}""",
-      andExpect = Status.Unauthorized,
-      withJsonBody = """Unauthorized token invalid for id 2"""
+      andExpect = Status.Ok,
+      withJsonBody = """{"token":"invalid","id":"2"}"""
     )
   }
 

@@ -1,4 +1,4 @@
-package org.pactDemo.utilities
+package org.pactDemo.finatraUtilities
 
 import javax.inject.Inject
 
@@ -6,11 +6,11 @@ import com.twitter.finagle.http.filter.Cors
 import com.twitter.finagle.http.filter.Cors.HttpFilter
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
-import com.twitter.finatra.http.{Controller, HttpServer}
-import com.twitter.finatra.http.filters.{CommonFilters, ExceptionMappingFilter, LoggingMDCFilter, TraceIdMDCFilter}
+import com.twitter.finatra.http.filters.{CommonFilters, ExceptionMappingFilter}
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.finatra.http.routing.HttpRouter
-import com.twitter.finatra.request.{QueryParam, RouteParam}
+import com.twitter.finatra.http.{Controller, HttpServer}
+import org.pactDemo.utilities.Heroku
 
 /** Admin port is at port +1 */
 class FinatraServer(defaultPort: Int, controllers: Controller*) extends HttpServer {

@@ -1,10 +1,9 @@
 package org.pactDemo.ios
 
 import com.twitter.finagle.Http
-import org.pactDemo.utilities.GenericCustomClient
+import org.pactDemo.finatraUtilities.GenericCustomClient
 import org.scalatest.{FunSpec, Matchers}
-import org.pactDemo.utilities.Futures._
-
+import org.pactDemo.finatraUtilities.Futures._
 /**
   * Created by aban.m on 04-07-2017.
   */
@@ -29,9 +28,9 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
         .runConsumerTest {
           mockConfig =>
             val rawHttpClient = Http.newService(mockConfig.host + ":" + mockConfig.port)
-            val client = new GenericCustomClient[IosCustomeAuthenticationRequest, IosCustomeAuthentication](rawHttpClient)
-            val request = IosCustomeAuthenticationRequest("1", "7899-valid-for-id-1-token")
-            client(request).await shouldBe IosCustomeAuthenticationValid
+            val client = new GenericCustomClient[IosProviderRequest, IosAuthResponse](rawHttpClient)
+            val request = IosProviderRequest(1, "7899-valid-for-id-1-token")
+            client(request).await shouldBe IosValidAuthResponse(1, "7899-valid-for-id-1-token")
         }
     }
 
@@ -50,9 +49,9 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
         .runConsumerTest {
           mockConfig =>
             val rawHttpClient = Http.newService(mockConfig.host + ":" + mockConfig.port)
-            val client = new GenericCustomClient[IosCustomeAuthenticationRequest, IosCustomeAuthentication](rawHttpClient)
-            val request = IosCustomeAuthenticationRequest("2", "112233-invalid-for-id-2-token")
-            client(request).await shouldBe IosCustomeAuthenticationInValid
+            val client = new GenericCustomClient[IosProviderRequest, IosAuthResponse](rawHttpClient)
+            val request = IosProviderRequest(2, "112233-invalid-for-id-2-token")
+            client(request).await shouldBe IosInValidAuthResponse(2, "112233-invalid-for-id-2-token")
         }
     }
 

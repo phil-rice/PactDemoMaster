@@ -5,7 +5,7 @@ import com.fasterxml.jackson.module.scala._
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
-import org.pactDemo.utilities.{AssetsController, FinatraServer, PactArrow}
+import org.pactDemo.finatraUtilities.{AssetsController, FinatraServer, PactArrow}
 
 
 case class AuthenticationRequestWithPrefixBody(`Authentication-token`: String){

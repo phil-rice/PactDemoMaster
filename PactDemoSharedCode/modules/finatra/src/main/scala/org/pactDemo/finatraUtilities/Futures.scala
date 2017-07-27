@@ -1,4 +1,4 @@
-package org.pactDemo.utilities
+package org.pactDemo.finatraUtilities
 
 import com.twitter.util.{Await, Future}
 

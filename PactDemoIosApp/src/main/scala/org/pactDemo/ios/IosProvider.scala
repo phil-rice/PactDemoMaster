@@ -1,59 +1,46 @@
 package org.pactDemo.ios
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.twitter.finagle.http.{Request, Response}
+import com.twitter.finagle.Http
+import com.twitter.finagle.http.{Method, Request, Response}
 import com.twitter.finatra.http.Controller
+import com.twitter.finatra.http.response.ResponseBuilder
+import com.twitter.finatra.request.RouteParam
 import com.twitter.util.Future
-import org.pactDemo.utilities.{AssetsController, FinatraServer, PactArrow}
-
-/**
-  * Created by prasenjit.b on 7/11/2017.
-  */
-
-trait FromRequest[T] extends (Request => T)
-
-trait MakeResponse[T] extends (T => Response)
-
-trait MapRequestToResponse[Req, Res] extends (Req => Future[Res])
-
-trait FromJsonToObject[FromObj, ToObj] extends (FromObj => ToObj)
-
-
-case class AuthTokenWithOutPrefix(`Authentication-token`: String) extends PactArrow {
-  def tokenWithOutPrefix = `Authentication-token`.split(" ") match {
-    case Array(prefix, token) => token
-    case Array(token) => token
-  }
-}
+import org.pactDemo.finatraUtilities.{FinatraServer, _}
+import org.pactDemo.utilities.Strings
 
 case class AuthToken(`Authentication-token`: String)
 
 object AuthToken extends PactArrow {
-  def extractTokenWithoutPrefix(authToken: AuthToken): String = (authToken.`Authentication-token`) ~> (AuthTokenWithOutPrefix(_)) ~> (_.tokenWithOutPrefix)
+  def extractTokenWithoutPrefix(authToken: AuthToken): String = Strings.removeStart("token ")(authToken.`Authentication-token`)
 
-  implicit object GetAuthTokenFromJSONResponseBody extends FromJsonToObject[Request, AuthToken] {
-    val mapper = new ObjectMapper()
-    mapper.registerModule(DefaultScalaModule)
-
-    override def apply(request: Request): AuthToken = mapper.readValue(request.contentString, classOf[AuthToken])
-  }
-
+  def getToken(raw: String)(implicit json: Json): String = extractTokenWithoutPrefix(json.fromJson[AuthToken](raw))
 }
 
 case class IosProviderRequest(id: Int, token: String)
 
 object IosProviderRequest extends PactArrow {
 
-  implicit object getIosProviderRequestFromHttpRequest extends FromRequest[IosProviderRequest] {
-
-
+  implicit def getIosProviderRequestFromHttpRequest(implicit json: Json) = new FromRequest[IosProviderRequest] {
     override def apply(request: Request): IosProviderRequest = {
-      val fromJson = implicitly[FromJsonToObject[Request, AuthToken]]
-      request ~> fromJson ~> (_.`Authentication-token`) ~> (AuthTokenWithOutPrefix(_)) ~> (_.tokenWithOutPrefix) ~> (IosProviderRequest(request.getIntParam("id"), _))
+
+      val id = Strings.lastSegmentOf(request.uri).toInt
+
+      val token = request ~> (_.contentString) ~> AuthToken.getToken
+      IosProviderRequest(id, token)
     }
   }
 
+  implicit def makeRequestForProviderFromIosProvider = new ToRequest[IosProviderRequest] {
+    override def apply(iosProviderRequest: IosProviderRequest): Request = {
+      val request = Request(s"/token/id/${iosProviderRequest.id}")
+
+      request.headerMap.add("ContentType", "application/hcl.token")
+      request.method = Method.Post
+      request.setContentString(s"""{"Authentication-token":"token ${iosProviderRequest.token}"}""")
+      request
+    }
+  }
 }
 
 sealed trait IosAuthResponse
@@ -65,40 +52,36 @@ case class IosInValidAuthResponse(id: Int, token: String) extends IosAuthRespons
 
 object IosAuthResponse extends PactArrow {
 
-  implicit object MapIosProviderRequestToIosAuthResponse extends MapRequestToResponse[IosProviderRequest, IosAuthResponse] {
-    override def apply(request: IosProviderRequest): Future[IosAuthResponse] = {
-      Future.value(request ~> createIosAuthResponse)
+  implicit object ToResponseIosAuthResponse extends ToResponse[IosAuthResponse] {
+    override def apply(response: ResponseBuilder)(authRespone: IosAuthResponse): Response = {
+      authRespone match {
+        case IosValidAuthResponse(id, token) => response.ok(s"""{"token":"$token","id":"$id"}""") ~> setResponseContentTypeToJson
+        case IosInValidAuthResponse(id, token) => response.unauthorized(s"Unauthorized token $token for id $id")
+      }
     }
   }
 
-  def createIosAuthResponse(request: IosProviderRequest): IosAuthResponse = {
-    if (request.token.contains("invalid")) IosInValidAuthResponse(request.id, request.token) else IosValidAuthResponse(request.id, request.token)
+  implicit object FromResponseForAuthResponse extends FromResponse[IosProviderRequest, IosAuthResponse] {
+    override def apply(request: IosProviderRequest, res: Response): IosAuthResponse = {
+      res.statusCode match {
+        case 200 => IosValidAuthResponse(request.id, request.token)
+        case _ => IosInValidAuthResponse(request.id, request.token)
+      }
+    }
   }
+
 }
 
+//case class IosRequest(@RouteParam id: Int, request: Request)
 
-class IosProvider() extends Controller with PactArrow {
+class IosProvider(clientService: IosProviderRequest => Future[IosAuthResponse]) extends Controller with RequestResponse {
 
-  def setResponseContentTypeToJson(response: Response): Response = {
-    response.setContentType("application/json");
-    response
+  import PactArrow._
+import Futures._
+  post("/token/id/:id") { request: Request =>
+    request ~> fromRequest[IosProviderRequest] ~> clientService ~> toResponse
   }
 
-  def fromCustomResponeToHttpResponse(authRespone: IosAuthResponse): Response = authRespone match {
-    case IosValidAuthResponse(id, token) => response.ok(s"""{"token":"$token","id":"$id"}""") ~> setResponseContentTypeToJson
-    case IosInValidAuthResponse(id, token) => response.unauthorized(s"Unauthorized token $token for id $id")
-  }
-
-  implicit object MakeResponseIosAuthResponse extends MakeResponse[IosAuthResponse] {
-    override def apply(authRespone: IosAuthResponse): Response = authRespone ~> fromCustomResponeToHttpResponse /*~> setResponseContentTypeToJson*/
-  }
-
-  val formRequest = implicitly[FromRequest[IosProviderRequest]]
-  val mapRequestToResponse = implicitly[MapRequestToResponse[IosProviderRequest, IosAuthResponse]]
-  val makeResponse = implicitly[MakeResponse[IosAuthResponse]]
-
-
-  post("/token/id/:id") { request: Request => request ~> formRequest ~> mapRequestToResponse ~> makeResponse }
   // Added options call to handle Cross-Origin problem
   options("/token/id/:*") { request: Request => response.ok }
   // Added this get call to handle index.html
@@ -106,5 +89,8 @@ class IosProvider() extends Controller with PactArrow {
 }
 
 object IosProvider extends App {
-  new FinatraServer(9030, new IosProvider, new AssetsController).main(Array())
+  val baseUrl = Option(System.getenv("provider")).getOrElse("localhost:9000")
+  val rawHttpClient = Http.newService(baseUrl)
+  val client = new GenericCustomClient[IosProviderRequest, IosAuthResponse](rawHttpClient)
+  new FinatraServer(9030, new IosProvider(client), new AssetsController).main(Array())
 }

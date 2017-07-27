@@ -13,7 +13,7 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Method, Request, Response}
 import com.twitter.util.Future
-import org.pactDemo.utilities.{CustomeRequestProcessor, CustomeResponseProcessor, GenericCustomClient, PactArrow}
+import org.pactDemo.finatraUtilities._
 
 import scala.concurrent.Await
 
@@ -26,25 +26,13 @@ object Util {
 
 case class ProcessRequest(input: String)
 
-case object closeProcess
-
-trait StringToObject[String, T] extends (String => T)
-
-object StringToObject {
-
-  implicit object makeObject extends StringToObject[String, CustomRequestObject] {
-    override def apply(input: String): CustomRequestObject = {
-      Util.getMapper.readValue(input, classOf[CustomRequestObject])
-    }
-  }
-
-}
+case object CloseProcess
 
 case class CustomRequestObject(id: Int, token: String)
 
 object CustomRequestObject {
 
-  implicit object makeRequest extends CustomeRequestProcessor[CustomRequestObject] {
+  implicit object ToRequestForCustomRequestObject extends ToRequest[CustomRequestObject] {
     override def apply(custObject: CustomRequestObject): Request = {
       val request = Request(s"/token/android/post")
       request.headerMap.add("ContentType", "application/hcl.token")
@@ -60,10 +48,9 @@ case class CustomReplyObject(id: Int, token: String, valid: Boolean) //, server:
 
 object CustomReplyObject {
 
-  implicit object makeCustomResponse extends CustomeResponseProcessor[CustomReplyObject] with PactArrow {
-    override def apply(response: Response): CustomReplyObject = {
-      //println(s"\n response.contentString : ${response.contentString}\n")
-      Util.getMapper.readValue(response.contentString, classOf[CustomReplyObject])
+  implicit def makeCustomResponse(implicit json: Json) = new FromResponse[CustomRequestObject, CustomReplyObject] with PactArrow {
+    override def apply(request: CustomRequestObject, response: Response): CustomReplyObject = {
+      json.fromJson[CustomReplyObject](response.contentString)
     }
   }
 
@@ -71,34 +58,39 @@ object CustomReplyObject {
 
 case class CustomRequest(param: CustomRequestObject)
 
-class AkkaPactSystem(restClient: GenericCustomClient[CustomRequestObject, CustomReplyObject]) extends Actor with PactArrow {
+trait AkkaPactSystemCommandExecutor {
+
+}
+
+class AkkaPactSystem(restClient: CustomRequestObject => Future[CustomReplyObject]) extends Actor with PactArrow {
+
+  def processRequest(processRequest: ProcessRequest)(implicit json: Json): ActorRef = {
+    val inputRequest = processRequest.input ~> json.fromJson[CustomRequestObject]
+    val requestProcessor: ActorRef = context.actorOf(Props(new CustomRequestProcessActor(restClient)), s"${inputRequest.id}-Processor")
+    requestProcessor ! CustomRequest(inputRequest)
+    requestProcessor
+  }
+
+  def closeProcess = {
+    println("System is going to shutdown @ " + Util.currentTime)
+    context.system.terminate
+  }
 
   override def receive: Receive = {
-    case ProcessRequest(input: String) => {
-
-      val convert = implicitly[StringToObject[String, CustomRequestObject]]
-      val inputRequest = input ~> convert
-
-      val requestProcessor: ActorRef = context.actorOf(Props(new CustomRequestProcessActor(restClient)), s"${inputRequest.id}-Processor")
-
-      requestProcessor ! CustomRequest(inputRequest)
-    }
-
-    case closeProcess =>
-      println("System is going to shutdown @ " + Util.currentTime)
-      context.system.terminate
+    case p: ProcessRequest => processRequest(p)
+    case CloseProcess => closeProcess
   }
 }
 
-class CustomRequestProcessActor(restClient: GenericCustomClient[CustomRequestObject, CustomReplyObject]) extends Actor with PactArrow {
+class CustomRequestProcessActor(restClient: CustomRequestObject => Future[CustomReplyObject]) extends Actor with PactArrow {
 
   override def receive: Receive = {
     case CustomRequest(request) =>
 
       val pureResponse = restClient(request)
 
-     // val returnVal : Future[CustomReplyObject] = pureResponse.map(x => x )// onSuccess(println(_))
-     // returnVal
+      // val returnVal : Future[CustomReplyObject] = pureResponse.map(x => x )// onSuccess(println(_))
+      // returnVal
 
       pureResponse.onSuccess(println(_))
 
@@ -122,14 +114,14 @@ object AkkaPactSystem {
     mainProcess ! ProcessRequest("""{"id": 2, "token":"54321-invalid-for-id-2-token"}""")
 
 
-  //  implicit val timeout = Timeout(5 seconds)
-  //  val future = mainProcess ? ProcessRequest("""{"id": 1, "token":"12345-valid-for-id-1-token"}""") // enabled by the “ask” import
-  //  val result = Await.result(future, timeout.duration).asInstanceOf[Future[CustomReplyObject]]
+    //  implicit val timeout = Timeout(5 seconds)
+    //  val future = mainProcess ? ProcessRequest("""{"id": 1, "token":"12345-valid-for-id-1-token"}""") // enabled by the “ask” import
+    //  val result = Await.result(future, timeout.duration).asInstanceOf[Future[CustomReplyObject]]
 
-  //  result.onSuccess(println(_))
+    //  result.onSuccess(println(_))
 
     Thread.sleep(5)
-    mainProcess ! closeProcess
+    mainProcess ! CloseProcess
   }
 
   def main(args: Array[String]): Unit = {

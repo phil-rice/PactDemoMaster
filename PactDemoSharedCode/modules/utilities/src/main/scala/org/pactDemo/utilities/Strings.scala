@@ -1,6 +1,9 @@
 package org.pactDemo.utilities
 
-case class FirstWordNotPresent(firstWord: String, s: String) extends Exception
+case class StartNotPresentException(firstWord: String, s: String) extends Exception
+
 object Strings {
-  def removeFirstWordCheckingEquals(firstWord: String)(s: String) = if s
+  def removeStart(firstWord: String)(s: String) = if (s.startsWith(firstWord)) s.substring(firstWord.length) else throw new StartNotPresentException(firstWord, s)
+
+  def lastSegmentOf(s: String): String = s.split("/").filter(_.length > 0).lastOption.getOrElse("")
 }

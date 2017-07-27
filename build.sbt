@@ -115,7 +115,8 @@ lazy val pactConsumerSettings = finatraSettings ++ Seq(
 )
 
 lazy val akkaSettings = Seq(
-  libraryDependencies += "com.typesafe.akka" %% "akka-actor" % versions.akka
+  libraryDependencies += "com.typesafe.akka" %% "akka-actor" % versions.akka,
+  libraryDependencies += "com.typesafe.akka" %% "akka-testkit" % versions.akka % "test"
 )
 
 lazy val javaPactSettings = Seq(
@@ -125,32 +126,41 @@ lazy val javaPactSettings = Seq(
 )
 
 lazy val appUtilities = (project in file("PactDemoSharedCode/modules/utilities")).
-  settings(finatraSettings: _*).
-  settings(jsonSettings: _*).
-  settings(akkaSettings: _*)
+  settings(commonSettings: _*)
 
-lazy val finatraUtilities = (project in file("PactDemoSharedCode/modules/finatra")).dependsOn(appUtilities).aggregate(appUtilities).
+lazy val finatraUtilities = (project in file("PactDemoSharedCode/modules/finatra")).
+  dependsOn(appUtilities % "test->test;compile->compile").aggregate(appUtilities).
+  settings(jsonSettings: _*).
   settings(finatraSettings: _*)
 
-lazy val javaAndroidApp = (project in file("PactDemoJavaAndroidConsumer")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
+lazy val javaAndroidApp = (project in file("PactDemoJavaAndroidConsumer")).
+  dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(finatraSettings: _*).
   settings(javaPactSettings: _*).
   enablePlugins(JavaAppPackaging)
 
-lazy val androidApp = (project in file("PactDemoAndroidApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
+lazy val androidApp = (project in file("PactDemoAndroidApp")).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
-lazy val akkaApp = (project in file("PactDemoAkkaApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
-  settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
+lazy val akkaApp = (project in file("PactDemoAkkaApp")).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).
+  aggregate(appUtilities, finatraUtilities).
+  settings(pactConsumerSettings: _*).
+  settings(akkaSettings: _*).
+  enablePlugins(JavaAppPackaging)
 
-lazy val iosApp = (project in file("PactDemoIosApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
+lazy val iosApp = (project in file("PactDemoIosApp")).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).
+  aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
 lazy val angularIOApp = (project in file("PactDemoAngularIOApp")).dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
 lazy val provider = (project in file("PactDemoProvider")).
-  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).aggregate(appUtilities, finatraUtilities).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).
+  aggregate(appUtilities, finatraUtilities).
   settings(finatraSettings: _*).
   settings(pactConsumerSettings: _*).
   enablePlugins(JavaAppPackaging)

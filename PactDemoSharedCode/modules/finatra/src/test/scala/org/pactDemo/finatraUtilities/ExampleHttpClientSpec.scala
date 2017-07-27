@@ -1,12 +1,13 @@
-package org.pactDemo.utilities
+package org.pactDemo.finatraUtilities
 
 import com.twitter.finagle.http.{Request, Response, Status}
 import com.twitter.util.Future
 import org.json4s.native.Serialization
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito._
-import org.pactDemo.utilities.Futures._
+import org.pactDemo.utilities._
 
+import Futures._
 
 case class ExampleReq(id: String)
 

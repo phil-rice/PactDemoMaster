@@ -1,4 +1,4 @@
-package org.pactDemo.utilities
+package org.pactDemo.finatraUtilities
 
 import com.twitter.util.Future
 
@@ -13,7 +13,9 @@ trait PactArrow{
     def ~>[T1](fn: T => T1) = fn(t)
   }
 
-  implicit class FuturePimper[T](t: Future[T]) {
+  implicit class FutureArrowPimper[T](t: Future[T]) {
     def ~>[T1](fn: T => T1) = t.map(fn)
   }
 }
+
+object PactArrow extends PactArrow
