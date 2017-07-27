@@ -9,3 +9,7 @@ import scala.reflect.ClassTag
 trait PactDemoSpec extends FlatSpec with Matchers with MockitoSugar{
   def capture[T: ClassTag]: ArgumentCaptor[T] = ArgumentCaptor.forClass(implicitly[ClassTag[T]].runtimeClass).asInstanceOf[ArgumentCaptor[T]]
 }
+
+trait PactDemoSpec2 extends Matchers with MockitoSugar{
+  def capture[T: ClassTag]: ArgumentCaptor[T] = ArgumentCaptor.forClass(implicitly[ClassTag[T]].runtimeClass).asInstanceOf[ArgumentCaptor[T]]
+}
