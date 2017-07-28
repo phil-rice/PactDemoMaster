@@ -7,19 +7,9 @@ import org.mockito.Mockito._
 import org.pactDemo.utilities.PactDemoSpec
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 
-class AssetsControllerSpec extends PactDemoSpec with BeforeAndAfterAll with BeforeAndAfter {
+class AssetsControllerSpec extends FinatraControllerSpec with BeforeAndAfterAll with BeforeAndAfter {
 
-  val server = new EmbeddedHttpServer(new FinatraServer(0, new AssetsController)) //the port is ignored
-
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    server.start()
-  }
-
-  override def afterAll(): Unit = {
-    server.close()
-    super.afterAll()
-  }
+  def controllerUnderTest = new AssetsController
 
   behavior of "Assets controller"
 
@@ -28,16 +18,15 @@ class AssetsControllerSpec extends PactDemoSpec with BeforeAndAfterAll with Befo
       path = "/",
       andExpect = Status.Ok,
       withBody = """IndexHtmlForTest"""
-    ).contentType shouldBe Some("text/html")
+    ).contentType shouldBe Some("text/html; charset=utf-8")
   }
   it should "return contents of index.html for '/index.html'" in {
     server.httpGet(
       path = "/index.html",
       andExpect = Status.Ok,
       withBody = """IndexHtmlForTest"""
-    ).contentType shouldBe Some("text/html")
+    ).contentType shouldBe Some("text/html; charset=utf-8")
   }
-
 
 
 }

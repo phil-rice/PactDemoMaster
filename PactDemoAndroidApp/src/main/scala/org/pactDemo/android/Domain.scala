@@ -43,6 +43,7 @@ object IdTokenAndValid {
       response.statusCode match {
         case 200 => json.fromJson[IdTokenAndValid](response.contentString)
         case 401 => IdTokenAndValid(request.id, request.token, false)
+        case s => throw new IllegalStatusCodeException(s, s"Response was $response")
       }
     }
   }

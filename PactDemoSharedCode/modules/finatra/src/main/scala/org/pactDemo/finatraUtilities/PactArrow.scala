@@ -1,21 +1,38 @@
 package org.pactDemo.finatraUtilities
 
+import com.twitter.logging.Logger
 import com.twitter.util.Future
 
-/**
-  * Created by prasenjit.b on 7/6/2017.
-  */
-//trait PackArrow[T]
+trait Pactlogger {
+  def apply(msg: String)
+}
 
-trait PactArrow{
+object Pactlogger {
 
-  implicit class AnyPimper[T](t: T) {
-    def ~>[T1](fn: T => T1) = fn(t)
+  implicit object PrintlnPactLogger extends Pactlogger {
+    override def apply(msg: String): Unit = println(msg)
   }
 
-  implicit class FutureArrowPimper[T](t: Future[T]) {
-    def ~>[T1](fn: T => T1) = t.map(fn)
+}
+
+trait PactArrow  {
+
+  protected var debugArrows = false
+
+  private def debug[T, T1](t: T, t1: => T1)(implicit pactlogger: Pactlogger): T1 = {
+    val result = t1
+    pactlogger(s"Arrow. Input ${t} Output ${t1}")
+    result
   }
+
+  implicit class AnyPimper[T](t: T)(implicit pactlogger: Pactlogger) {
+    def ~>[T1](fn: T => T1) = debug(t, fn(t))
+  }
+
+  implicit class FutureArrowPimper[T](t: Future[T])(implicit pactlogger: Pactlogger) {
+    def ~>[T1](fn: T => T1) =  t.map(x => debug(x, fn(x)))
+  }
+
 }
 
 object PactArrow extends PactArrow

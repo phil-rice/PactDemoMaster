@@ -27,6 +27,7 @@ lazy val commonSettings = Seq(
   scalaVersion := versions.scala,
   scalacOptions ++= Seq("-feature"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
+  parallelExecution in Test := false,
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     "Twitter Maven" at "https://maven.twttr.com",
@@ -134,13 +135,15 @@ lazy val finatraUtilities = (project in file("PactDemoSharedCode/modules/finatra
   settings(finatraSettings: _*)
 
 lazy val javaAndroidApp = (project in file("PactDemoJavaAndroidConsumer")).
-  dependsOn(appUtilities, finatraUtilities).aggregate(appUtilities, finatraUtilities).
+  dependsOn(appUtilities, finatraUtilities).
+  aggregate(appUtilities, finatraUtilities).
   settings(finatraSettings: _*).
   settings(javaPactSettings: _*).
   enablePlugins(JavaAppPackaging)
 
 lazy val androidApp = (project in file("PactDemoAndroidApp")).
-  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).aggregate(appUtilities, finatraUtilities).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities% "test->test;compile->compile").
+  aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
 lazy val akkaApp = (project in file("PactDemoAkkaApp")).
@@ -151,7 +154,7 @@ lazy val akkaApp = (project in file("PactDemoAkkaApp")).
   enablePlugins(JavaAppPackaging)
 
 lazy val iosApp = (project in file("PactDemoIosApp")).
-  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities% "test->test;compile->compile").
   aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
@@ -159,7 +162,7 @@ lazy val angularIOApp = (project in file("PactDemoAngularIOApp")).dependsOn(appU
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
 lazy val provider = (project in file("PactDemoProvider")).
-  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities% "test->test;compile->compile").
   aggregate(appUtilities, finatraUtilities).
   settings(finatraSettings: _*).
   settings(pactConsumerSettings: _*).

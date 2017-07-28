@@ -2,27 +2,18 @@ package org.pactDemo.ios
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
+import com.twitter.inject.server.{FeatureTest, FeatureTestMixin}
 import com.twitter.util.Future
-import org.pactDemo.finatraUtilities.FinatraServer
+import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer}
 import org.pactDemo.utilities.PactDemoSpec
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FlatSpec}
-
 import org.mockito.Mockito._
+import org.scalatest.mockito.MockitoSugar
 
-class IosProviderSpec extends PactDemoSpec with BeforeAndAfterAll with BeforeAndAfter {
+class IosProviderSpec extends FinatraControllerSpec with FeatureTestMixin with BeforeAndAfter {
 
   val fakeProvider = mock[IosProviderRequest => Future[IosAuthResponse]]
-  val server = new EmbeddedHttpServer(new FinatraServer(0, new IosProvider(fakeProvider))) //the port is ignored
-
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    server.start()
-  }
-
-  override def afterAll(): Unit = {
-    server.close()
-    super.afterAll()
-  }
+  def controllerUnderTest = new IosProvider(fakeProvider)
 
   before {
     reset(fakeProvider)

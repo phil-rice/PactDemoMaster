@@ -4,32 +4,22 @@ import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.util.Future
 import org.mockito.Mockito._
-import org.pactDemo.android.{AndroidProviderController, IdAndToken, IdTokenAndValid}
-import org.pactDemo.finatraUtilities.FinatraServer
+import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer}
 import org.pactDemo.utilities.PactDemoSpec
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FeatureSpec}
 
-class AndroidProviderSpec extends PactDemoSpec with BeforeAndAfterAll with BeforeAndAfter {
+class AndroidProviderSpec extends FinatraControllerSpec with BeforeAndAfter {
 
   val fakeProvider = mock[IdAndToken => Future[IdTokenAndValid]]
-  val server = new EmbeddedHttpServer(new FinatraServer(0, new AndroidProviderController(fakeProvider))) //the port is ignored
-
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    server.start()
-  }
-
-  override def afterAll(): Unit = {
-    server.close()
-    super.afterAll()
-  }
+  def controllerUnderTest = new AndroidProviderController(fakeProvider)
 
   before {
     reset(fakeProvider)
   }
 
-  behavior of "IosProvider"
-  it should "Meet its response for IosProvider for Success scenario" in {
+  behavior of "IdAndToken => Future[IdTokenAndValid] service"
+
+  it should "process successes" in {
     when(fakeProvider.apply(IdAndToken(1, "validToken"))) thenReturn Future.value(IdTokenAndValid(1, "validToken", true))
     server.httpPost(
       path = "/token/android/post",
@@ -39,7 +29,7 @@ class AndroidProviderSpec extends PactDemoSpec with BeforeAndAfterAll with Befor
     )
   }
 
-  it should "Meet its response for IosProvider for Failure scenario" in {
+  it should "process failures" in {
     when(fakeProvider.apply(IdAndToken(2, "invalidToken"))) thenReturn Future.value(IdTokenAndValid(2, "invalidToken", false))
     server.httpPost(
       path = "/token/android/post",
