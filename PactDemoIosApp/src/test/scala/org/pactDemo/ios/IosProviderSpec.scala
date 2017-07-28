@@ -1,18 +1,16 @@
 package org.pactDemo.ios
 
 import com.twitter.finagle.http.Status
-import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.{FeatureTest, FeatureTestMixin}
+import com.twitter.inject.server.FeatureTestMixin
 import com.twitter.util.Future
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer}
-import org.pactDemo.utilities.PactDemoSpec
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FlatSpec}
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.pactDemo.finatraUtilities.FinatraControllerSpec
+import org.scalatest.BeforeAndAfter
 
 class IosProviderSpec extends FinatraControllerSpec with FeatureTestMixin with BeforeAndAfter {
 
   val fakeProvider = mock[IosProviderRequest => Future[IosAuthResponse]]
+
   def controllerUnderTest = new IosProvider(fakeProvider)
 
   before {

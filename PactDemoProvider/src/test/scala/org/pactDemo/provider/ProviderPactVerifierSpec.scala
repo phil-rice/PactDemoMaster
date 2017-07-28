@@ -10,7 +10,7 @@ class ProviderPactVerifierSpec extends FinatraControllerSpec {
   def controllerUnderTest = new ProviderController(new AuthenticationService)
 
 
-  behavior of "Provider"
+//  behavior of "Provider"
 
   it should "Meet its pacts with Android" in {
     verifyPact

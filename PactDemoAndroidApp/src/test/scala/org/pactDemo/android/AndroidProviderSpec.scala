@@ -11,6 +11,7 @@ import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FeatureSpec}
 class AndroidProviderSpec extends FinatraControllerSpec with BeforeAndAfter {
 
   val fakeProvider = mock[IdAndToken => Future[IdTokenAndValid]]
+
   def controllerUnderTest = new AndroidProviderController(fakeProvider)
 
   before {

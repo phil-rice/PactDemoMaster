@@ -3,6 +3,8 @@ package org.pactDemo.finatraUtilities
 import com.twitter.logging.Logger
 import com.twitter.util.Future
 
+import scala.util.Try
+
 trait Pactlogger {
   def apply(msg: String)
 }
@@ -20,9 +22,9 @@ trait PactArrow  {
   protected var debugArrows = false
 
   private def debug[T, T1](t: T, t1: => T1)(implicit pactlogger: Pactlogger): T1 = {
-    val result = t1
-    pactlogger(s"Arrow. Input ${t} Output ${t1}")
-    result
+    val result = Try(t1)
+    pactlogger(s"Arrow. Input $t Output $result")
+    result.get
   }
 
   implicit class AnyPimper[T](t: T)(implicit pactlogger: Pactlogger) {
