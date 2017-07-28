@@ -38,9 +38,9 @@ class AndroidFullPathToPathSpec extends FinatraControllerSpec with BeforeAndAfte
           provider.delegate = client
           server.httpPost(
             path = "/token/android/post",
-            postBody = """{"id": 1, "token":"validToken"}""",
+            postBody = """{"id": 1, "token":"12345-valid-for-id-1-token"}""",
             andExpect = Status.Ok,
-            withJsonBody = """{"id":1,"token":"validToken","valid":true}"""
+            withJsonBody = """{"id":1,"token":"12345-valid-for-id-1-token","valid":true}"""
           )
       }
   }
@@ -65,9 +65,9 @@ class AndroidFullPathToPathSpec extends FinatraControllerSpec with BeforeAndAfte
           provider.delegate = client
           server.httpPost(
             path = "/token/android/post",
-            postBody = """{"id": 2, "token":"invalidToken"}""",
+            postBody = """{"id": 2, "token":"54321-invalid-for-id-2-token"}""",
             andExpect = Status.Ok,
-            withJsonBody = """{"token":"invalidToken","id":2,"valid": false}"""
+            withJsonBody = """{"token":"54321-invalid-for-id-2-token","id":2,"valid": false}"""
           )
       }
   }

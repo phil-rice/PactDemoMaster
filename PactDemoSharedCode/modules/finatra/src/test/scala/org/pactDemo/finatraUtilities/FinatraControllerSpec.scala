@@ -3,8 +3,9 @@ package org.pactDemo.finatraUtilities
 import com.twitter.finatra.http.{Controller, EmbeddedHttpServer}
 import com.twitter.inject.server.{FeatureTest, FeatureTestMixin}
 import org.pactDemo.utilities.PactDemoSpec
+import org.scalatest.BeforeAndAfterAll
 
-trait FinatraControllerSpec extends PactDemoSpec with FeatureTestMixin   {
+trait FinatraControllerSpec extends PactDemoSpec with FeatureTestMixin with BeforeAndAfterAll {
 
   def controllerUnderTest: Controller
 
@@ -14,5 +15,13 @@ trait FinatraControllerSpec extends PactDemoSpec with FeatureTestMixin   {
     result
   }
   lazy val server = new EmbeddedHttpServer(new FinatraServer(0, c)) //the port is ignored
+
+  override def beforeAll(): Unit = {
+
+  }
+
+  override def afterAll(): Unit = {
+    server.close
+  }
 
 }
