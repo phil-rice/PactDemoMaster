@@ -82,23 +82,33 @@ class AkkaPactSystem(restClient: CustomRequestObject => Future[CustomReplyObject
   }
 }
 
+trait ProviderResponse
+case object ProviderSuccessful extends  ProviderResponse
+case object ProviderFailure extends  ProviderResponse
+
 class CustomRequestProcessActor(restClient: CustomRequestObject => Future[CustomReplyObject]) extends Actor with PactArrow {
 
   override def receive: Receive = {
     case CustomRequest(request) =>
 
       val pureResponse = restClient(request)
+      pureResponse.onSuccess(x=> {
+        x.valid match {
+          case true => sender ! ProviderSuccessful
+          case _ => sender ! ProviderFailure
+        }
+        // self ! Pr
+      }).onFailure( x=> {
+        x.printStackTrace()
+        sender ! ProviderFailure
+      })
+    case _ =>
+      sender ! ProviderFailure
 
-      // val returnVal : Future[CustomReplyObject] = pureResponse.map(x => x )// onSuccess(println(_))
-      // returnVal
-
-      pureResponse.onSuccess(println(_))
-
-      Thread.sleep(500)
-
-    case _ => println("None - valid")
   }
 }
+
+
 
 object AkkaPactSystem {
 
