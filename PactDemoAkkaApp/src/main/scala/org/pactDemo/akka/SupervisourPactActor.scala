@@ -3,7 +3,7 @@ package org.pactDemo.akka
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorContext, ActorRef, ActorSystem, Props}
 import akka.util.Timeout
 import akka.pattern.ask
 
@@ -15,7 +15,7 @@ import com.twitter.finagle.http.{Method, Request, Response}
 import com.twitter.util.Future
 import org.pactDemo.finatraUtilities._
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 
 
 object Util {
@@ -62,12 +62,47 @@ trait AkkaPactSystemCommandExecutor {
 
 }
 
-class AkkaPactSystem(restClient: CustomRequestObject => Future[CustomReplyObject]) extends Actor with PactArrow {
+trait ChildActorFactory {
+  def apply(context: ActorContext,id: Int, restClient: CustomRequestObject => Future[CustomReplyObject]) : ActorRef
+}
 
-  def processRequest(processRequest: ProcessRequest)(implicit json: Json): ActorRef = {
+object ChildActorFactory {
+  implicit object defaultChildActorFactory extends ChildActorFactory {
+    override def apply(context: ActorContext,id: Int, restClient: CustomRequestObject => Future[CustomReplyObject]) : ActorRef = {
+      context.actorOf(Props(new CustomRequestProcessActor(restClient)), s"${id}-Processor")
+    }
+  }
+}
+
+class SupervisourPactActor(restClient: CustomRequestObject => Future[CustomReplyObject])(implicit childActorFactory : ChildActorFactory, json: Json) extends Actor with PactArrow {
+
+  println(s"object create :: ${restClient} // ${childActorFactory}")
+
+  implicit val timeout = Timeout(5 second)
+
+  def processRequest(processRequest: ProcessRequest): ActorRef = {
+
+    println(" start of processRequest \n")
+
     val inputRequest = processRequest.input ~> json.fromJson[CustomRequestObject]
-    val requestProcessor: ActorRef = context.actorOf(Props(new CustomRequestProcessActor(restClient)), s"${inputRequest.id}-Processor")
-    requestProcessor ! CustomRequest(inputRequest)
+
+    //val requestProcessor: ActorRef = context.actorOf(Props(new CustomRequestProcessActor(restClient)), s"${inputRequest.id}-Processor")
+
+    val requestProcessor: ActorRef = childActorFactory(context, inputRequest.id, restClient)
+
+    //implicit val executionContext : ExecutionContext = ???
+
+    import context.dispatcher
+
+
+    //requestProcessor ! CustomRequest(inputRequest)
+    val x: concurrent.Future[Any] = (requestProcessor ? CustomRequest(inputRequest))
+      x.foreach[Any]{ x =>
+        println(s"request back : ${x}")
+        println(s"sender : ${sender()}")
+        sender() ! x
+      }
+
     requestProcessor
   }
 
@@ -91,26 +126,30 @@ class CustomRequestProcessActor(restClient: CustomRequestObject => Future[Custom
   override def receive: Receive = {
     case CustomRequest(request) =>
 
-      val pureResponse = restClient(request)
-      pureResponse.onSuccess(x=> {
-        x.valid match {
-          case true => sender ! ProviderSuccessful
-          case _ => sender ! ProviderFailure
-        }
-        // self ! Pr
-      }).onFailure( x=> {
-        x.printStackTrace()
-        sender ! ProviderFailure
-      })
-    case _ =>
-      sender ! ProviderFailure
+      try {
+        val pureResponse = restClient(request)
+        pureResponse.onSuccess(x => {
+
+          x.valid match {
+            case true => sender ! ProviderSuccessful
+            case _ => sender ! ProviderFailure
+          }
+          // self ! Pr
+        }).onFailure(x => {
+          sender ! ProviderFailure
+        })
+      } catch {
+        case e: Exception => sender ! ProviderFailure
+      }
+    case x =>
+          sender ! ProviderFailure
 
   }
 }
 
 
 
-object AkkaPactSystem {
+object SupervisourPactActor {
 
   def akkaProcessing(host: String, port: String) = {
     val system = ActorSystem("AkkaPactSystem")
@@ -118,7 +157,7 @@ object AkkaPactSystem {
     val rawHttpClient = Http.newService(host + ":" + port)
     val restClient = new GenericCustomClient[CustomRequestObject, CustomReplyObject](rawHttpClient)
 
-    val mainProcess: ActorRef = system.actorOf(Props(new AkkaPactSystem(restClient)), "Main-Process")
+    val mainProcess: ActorRef = system.actorOf(Props(new SupervisourPactActor(restClient)), "Main-Process")
 
     mainProcess ! ProcessRequest("""{"id": 1, "token":"12345-valid-for-id-1-token"}""")
     mainProcess ! ProcessRequest("""{"id": 2, "token":"54321-invalid-for-id-2-token"}""")

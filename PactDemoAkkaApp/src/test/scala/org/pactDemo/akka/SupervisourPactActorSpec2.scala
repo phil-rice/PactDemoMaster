@@ -14,7 +14,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 
-class AkkaPactSystemSpec2 extends TestKit(ActorSystem("MySpec"))
+class SupervisourPactActorSpec2 extends TestKit(ActorSystem("MySpec"))
   with ImplicitSender
   with WordSpecLike
   with BeforeAndAfterAll
@@ -60,9 +60,27 @@ class AkkaPactSystemSpec2 extends TestKit(ActorSystem("MySpec"))
     }
 
     "send back ProviderFailure response for Empty request" in {
-      when(pactClient.apply(CustomRequestObject(0, ""))) thenReturn Future.value(CustomReplyObject(0, "", false))
+      when(pactClient.apply(CustomRequestObject(4, ""))) thenReturn Future.value(CustomReplyObject(4, "", false))
 
-      val future = childPactActor ? CustomRequestObject(0, "")
+      val future = childPactActor ? CustomRequest(CustomRequestObject(4, ""))//CustomRequestObject(4, "")
+      val result: ProviderResponse =  Await.result(future, timeout.duration).asInstanceOf[ProviderResponse]
+      result shouldBe ProviderFailure
+    }
+
+    val validException = new RuntimeException
+
+    "send back provider failer if response is an exception" in {
+      when(pactClient.apply(CustomRequestObject(5, ""))) thenReturn Future.exception(validException)
+
+      val future = childPactActor ? CustomRequest(CustomRequestObject(5, ""))//CustomRequestObject(5, "")
+      val result: ProviderResponse =  Await.result(future, timeout.duration).asInstanceOf[ProviderResponse]
+      result shouldBe ProviderFailure
+    }
+
+    "send back provider failer if pact client throw an exception" in {
+      when(pactClient.apply(CustomRequestObject(6, ""))) thenThrow(validException)
+
+      val future = childPactActor ? CustomRequest(CustomRequestObject(6, ""))//CustomRequestObject(6, "")
       val result: ProviderResponse =  Await.result(future, timeout.duration).asInstanceOf[ProviderResponse]
       result shouldBe ProviderFailure
     }
