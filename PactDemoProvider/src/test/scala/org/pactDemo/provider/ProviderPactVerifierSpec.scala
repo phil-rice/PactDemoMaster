@@ -2,24 +2,15 @@ package org.pactDemo.provider
 
 import com.itv.scalapact.ScalaPactVerify._
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.pactDemo.finatraUtilities.FinatraServer
+import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer}
 import org.scalatest.{BeforeAndAfterAll, FlatSpec}
 
-class ProviderPactVerifierSpec extends FlatSpec with BeforeAndAfterAll {
+class ProviderPactVerifierSpec extends FinatraControllerSpec {
 
-  val server = new EmbeddedHttpServer(new FinatraServer(0, new ProviderController(new AuthenticationService))) //the port is ignored
+  def controllerUnderTest = new ProviderController(new AuthenticationService)
 
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    server.start()
-  }
 
-  override def afterAll(): Unit = {
-    server.close()
-    super.afterAll()
-  }
-
-  behavior of "Provider"
+//  behavior of "Provider"
 
   it should "Meet its pacts with Android" in {
     verifyPact

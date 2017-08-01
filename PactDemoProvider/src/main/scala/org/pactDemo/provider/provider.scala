@@ -71,7 +71,7 @@ trait FromRequest[T] extends (Request => T)
 
 trait MakeResponse[T] extends (T => Response)
 
-class ProviderController(authenticationService: AuthenticationService) extends Controller with PactArrow {
+class ProviderController(authenticationService: AuthenticationRequest => Future[AuthenticationResult]) extends Controller with PactArrow {
 
   implicit object MakeResponseForAuthenticationResult extends MakeResponse[AuthenticationResult] {
     override def apply(v1: AuthenticationResult): Response = v1 match {

@@ -7,11 +7,11 @@ export password=$2
 #	Delete All Existing PACT files
 # #####################################
 curl -X DELETE \
-	https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomeIos/version/1.0.0 \
+	https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomerIos/version/1.0.0 \
 	-u $username:$password
 
 curl -X DELETE \
-	https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomeAndroid/version/1.0.0 \
+	https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomerAndroid/version/1.0.0 \
 	-u $username:$password
 
 
@@ -21,7 +21,7 @@ curl -X DELETE \
 # #####################################
 	
 curl -X PUT \
-  https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomeIos/version/1.0.0 \
+  https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomerIos/version/1.0.0 \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
   -u $username:$password \
@@ -29,7 +29,7 @@ curl -X PUT \
 
 
 curl -X PUT \
-    https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomeAndroid/version/1.0.0 \
+    https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomerAndroid/version/1.0.0 \
     -H 'cache-control: no-cache' \
     -H 'content-type: application/json' \
     -u $username:$password \
