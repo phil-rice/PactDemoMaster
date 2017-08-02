@@ -12,7 +12,7 @@ class ProviderPactVerifierSpec extends FinatraControllerSpec {
 
 //  behavior of "Provider"
 
-  it should "Meet its pacts with Android" in {
+  /*it should "Meet its pacts with Android" in {
     verifyPact
       .withPactSource(loadFromLocal("target/pacts/CustomerAndroid_Provider.json"))
       .noSetupRequired // We did the setup in the beforeAll() function
@@ -24,12 +24,34 @@ class ProviderPactVerifierSpec extends FinatraControllerSpec {
       .withPactSource(loadFromLocal("target/pacts/CustomerIos_Provider.json"))
       .noSetupRequired // We did the setup in the beforeAll() function
       .runVerificationAgainst("localhost", server.httpExternalPort)
+  }*/
+
+  var url  = "https://hcl.pact.dius.com.au"
+  val vtc = VerifyTargetConfig("https","hlHPfcw9xLlKOh6d31ZFeL37tMxk1mW:EeiQA3xoTY3fEfjf94O36zaWXsrnaGZ@hcl.pact.dius.com.au",443,10)
+
+  it should "Meet its pacts with Android" in {
+    verifyPact
+
+      //.withPactSource(pactBroker(url,"Provider", List("Android")))
+      .withPactSource(pactBrokerWithVersion(url,"1.0.0","Provider", List("Android")))
+
+      .noSetupRequired // We did the setup in the beforeAll() function
+      //.runVerificationAgainst("localhost", server.httpExternalPort)
+
+      .runVerificationAgainst(vtc)
   }
 
-  it should "Meet its pacts with Angular" in {
+  it should "Meet its pacts with IOS" in {
     verifyPact
-      .withPactSource(loadFromLocal("target/pacts/AngularIOConsumer_Provider.json"))
+      .withPactSource(pactBrokerWithVersion(url,"1.0.0","Provider", List("Ios")))
+
       .noSetupRequired // We did the setup in the beforeAll() function
-      .runVerificationAgainst("localhost", server.httpExternalPort)
+      //.runVerificationAgainst("localhost", server.httpExternalPort)
+
+      .runVerificationAgainst(vtc)
   }
+
+
+
+
 }
