@@ -15,6 +15,10 @@ then
 fi
 
 # Create temp location`
+echo ''
+echo ''
+echo 'create folder $tempPactFileLocation'
+echo ''
 mkdir -p $tempPactFileLocation
 
 # Download pact files in temp location

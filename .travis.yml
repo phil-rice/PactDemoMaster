@@ -4,7 +4,7 @@ scala:
 jdk:
 - oraclejdk8
 # script: sbt ++$TRAVIS_SCALA_VERSION clean pactTest
-script: ./loadPactTestAndRun.sh $TRAVIS_SCALA_VERSION $PACT_BROKER_USERNAME $PACT_BROKER_PASSWORD $PACT_TEMP_LOCATION
+script: sh loadPactTestAndRun.sh $TRAVIS_SCALA_VERSION $PACT_BROKER_USERNAME $PACT_BROKER_PASSWORD $PACT_TEMP_LOCATION
 after_success:
 - '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publishLocal publish; };'
 - 'echo " Username - $PACT_BROKER_USERNAME  password - $PACT_BROKER_PASSWORD" '
