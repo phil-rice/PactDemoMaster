@@ -5,19 +5,19 @@ import com.fasterxml.jackson.module.scala._
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
-import org.pactDemo.finatraUtilities.{AssetsController, FinatraServer, PactArrow}
+import org.pactDemo.finatraUtilities._
 
 
-case class AuthenticationRequestWithPrefixBody(`Authentication-token`: String){
-  def copyWithoutPrefix =  `Authentication-token`.split(" ") match {
-    case Array(prefix, token) => AuthenticationRequestWithPrefixBody( token )
-    case Array(token) => AuthenticationRequestWithPrefixBody( token )
+case class AuthenticationRequestWithPrefixBody(`Authentication-token`: String) {
+  def copyWithoutPrefix = `Authentication-token`.split(" ") match {
+    case Array(prefix, token) => AuthenticationRequestWithPrefixBody(token)
+    case Array(token) => AuthenticationRequestWithPrefixBody(token)
   }
 }
 
 case class AuthenticationRequestBody(`Authentication-token`: String)
 
-trait FromJsonToObject[From, To] extends ( From => To )
+trait FromJsonToObject[From, To] extends (From => To)
 
 object AuthenticationRequestBody {
 
@@ -29,17 +29,19 @@ object AuthenticationRequestBody {
       mapper.readValue(body.contentString, classOf[AuthenticationRequestBody])
     }
   }
+
 }
 
-trait GetActualToken[T, B] extends ( T => B )
+trait GetActualToken[T, B] extends (T => B)
 
 object GetActualToken extends PactArrow {
 
   implicit object GetActualTokenForAuthenticationRequestBody extends GetActualToken[AuthenticationRequestBody, AuthenticationRequestWithPrefixBody] {
     override def apply(requestBody: AuthenticationRequestBody): AuthenticationRequestWithPrefixBody = {
-      ( requestBody.`Authentication-token` ) ~> ( AuthenticationRequestWithPrefixBody( _ ) ) ~> ( _.copyWithoutPrefix )
+      (requestBody.`Authentication-token`) ~> (AuthenticationRequestWithPrefixBody(_)) ~> (_.copyWithoutPrefix)
     }
   }
+
 }
 
 object AuthenticationRequest extends PactArrow {
@@ -47,10 +49,11 @@ object AuthenticationRequest extends PactArrow {
   val GetActualToken = implicitly[GetActualToken[AuthenticationRequestBody, AuthenticationRequestWithPrefixBody]]
 
   implicit object FromJsonForAuthenticationRequest extends FromRequest[AuthenticationRequest] {
-    override def apply(request: Request): AuthenticationRequest ={
-      request ~> fromJson ~> GetActualToken ~> ( _.`Authentication-token` )~> ( AuthenticationRequest( request.getIntParam( "id" ), _  ) )
+    override def apply(request: Request): AuthenticationRequest = {
+      request ~> fromJson ~> GetActualToken ~> (_.`Authentication-token`) ~> (AuthenticationRequest(request.getIntParam("id"), _))
     }
   }
+
 }
 
 case class AuthenticationRequest(id: Int, token: String)
@@ -85,10 +88,12 @@ class ProviderController(authenticationService: AuthenticationRequest => Future[
 
   post("/token/id/:id") { request: Request => request ~> fromRequest ~> authenticationService ~> makeResponse }
   // Added options call to handle Cross-Origin problem
-  options("/token/id/:*") {  request: Request => response.ok }
+  options("/token/id/:*") { request: Request => response.ok }
 }
 
 
 object Provider extends App {
-  new FinatraServer(9000, new ProviderController(new AuthenticationService), new AssetsController).main(Array())
+  implicit val logger = PrintlnLogMe
+
+  new FinatraServer(9000, new ProviderController(new LoggingClient("AuthenticationService", "", new AuthenticationService)), new AssetsController).main(Array())
 }

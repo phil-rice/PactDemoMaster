@@ -1,7 +1,7 @@
 package org.pactDemo.android
 
 import com.twitter.finagle.Http
-import com.twitter.finagle.http.Request
+import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
 import org.pactDemo.finatraUtilities._
@@ -15,8 +15,9 @@ class AndroidProviderController(client: IdAndToken => Future[IdTokenAndValid]) e
 
 
 object AndroidIOApp extends App {
+  implicit val logger = PrintlnLogMe
   val baseUrl = Option(System.getenv("provider")).getOrElse("localhost:9000")
-  val rawHttpClient = Http.newService(baseUrl)
-  val client = new GenericCustomClient[IdAndToken, IdTokenAndValid](rawHttpClient)
+  val rawHttpClient = new LoggingClient[Request, Response]("ProviderHttp", "", Http.newService(baseUrl))
+  val client = new LoggingClient[IdAndToken, IdTokenAndValid]("Provider", "",new GenericCustomClient[IdAndToken, IdTokenAndValid](rawHttpClient))
   new FinatraServer(9090, new AndroidProviderController(client), new AssetsController).main(Array())
 }
