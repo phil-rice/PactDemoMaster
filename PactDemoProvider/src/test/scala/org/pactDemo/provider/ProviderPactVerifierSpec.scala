@@ -12,7 +12,7 @@ class ProviderPactVerifierSpec extends FinatraControllerSpec {
 
 //  behavior of "Provider"
 
-  /*it should "Meet its pacts with Android" in {
+  it should "Meet its pacts with Android" in {
     verifyPact
       .withPactSource(loadFromLocal("target/pacts/CustomerAndroid_Provider.json"))
       .noSetupRequired // We did the setup in the beforeAll() function
@@ -24,9 +24,31 @@ class ProviderPactVerifierSpec extends FinatraControllerSpec {
       .withPactSource(loadFromLocal("target/pacts/CustomerIos_Provider.json"))
       .noSetupRequired // We did the setup in the beforeAll() function
       .runVerificationAgainst("localhost", server.httpExternalPort)
-  }*/
+  }
 
-  var url  = "https://hcl.pact.dius.com.au"
+
+
+
+
+
+
+
+
+  it should "Meet its temp pacts with Android" in {
+    verifyPact
+      .withPactSource(loadFromLocal("tmp/pacts/android.json"))
+      .noSetupRequired // We did the setup in the beforeAll() function
+      .runVerificationAgainst("localhost", server.httpExternalPort)
+  }
+
+  it should "Meet its temp pacts with IOS" in {
+    verifyPact
+      .withPactSource(loadFromLocal("tmp/pacts/ios.json"))
+      .noSetupRequired // We did the setup in the beforeAll() function
+      .runVerificationAgainst("localhost", server.httpExternalPort)
+  }
+
+  /*var url  = "https://hcl.pact.dius.com.au"
   val vtc = VerifyTargetConfig("https","hlHPfcw9xLlKOh6d31ZFeL37tMxk1mW:EeiQA3xoTY3fEfjf94O36zaWXsrnaGZ@hcl.pact.dius.com.au",443,10)
 
   it should "Meet its pacts with Android" in {
@@ -49,7 +71,7 @@ class ProviderPactVerifierSpec extends FinatraControllerSpec {
       //.runVerificationAgainst("localhost", server.httpExternalPort)
 
       .runVerificationAgainst(vtc)
-  }
+  }*/
 
 
 
