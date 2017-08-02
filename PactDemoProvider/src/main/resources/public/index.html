@@ -12,6 +12,7 @@
                 }
             };
             xhttp.open("POST", url, true);
+//            xhttp.setRequestHeader("host", window.location.hostname);
             var token = document.getElementById("token").value
             var json = '{"Authentication-token":"token ' + token + '"}'
             document.getElementById("sent").innerHTML = json

@@ -17,7 +17,8 @@ class AndroidProviderController(client: IdAndToken => Future[IdTokenAndValid]) e
 object AndroidIOApp extends App {
   implicit val logger = PrintlnLogMe
   val baseUrl = Option(System.getenv("provider")).getOrElse("localhost:9000")
-  val rawHttpClient = new LoggingClient[Request, Response]("ProviderHttp", "", Http.newService(baseUrl))
-  val client = new LoggingClient[IdAndToken, IdTokenAndValid]("Provider", "",new GenericCustomClient[IdAndToken, IdTokenAndValid](rawHttpClient))
+  val Array(host, _) = baseUrl.split(":")
+  val rawHttpClient = new AddHostNameService(host, new LoggingClient[Request, Response]("ProviderHttp", "", Http.newService(baseUrl)))
+  val client = new LoggingClient[IdAndToken, IdTokenAndValid]("Provider", "", new GenericCustomClient[IdAndToken, IdTokenAndValid](rawHttpClient))
   new FinatraServer(9090, new AndroidProviderController(client), new AssetsController).main(Array())
 }
