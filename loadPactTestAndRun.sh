@@ -20,8 +20,13 @@ mkdir -p $tempPactFileLocation
 # Download pact files in temp location
 wget --user=$username --password=$password -O $tempPactFileLocation/android.json https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/Android/latest
 
+echo 'android'
+cat $tempPactFileLocation/android.json
+
 wget --user=$username --password=$password -O $tempPactFileLocation/ios.json https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/Ios/latest
 
+echo 'ios'
+cat $tempPactFileLocation/ios.json
 
 # SBT BUILD
 sbt ++$TRAVIS_SCALA_VERSION clean pactTest
