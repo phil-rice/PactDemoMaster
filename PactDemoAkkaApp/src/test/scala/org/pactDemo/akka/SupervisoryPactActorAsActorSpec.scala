@@ -12,14 +12,16 @@ import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Matchers, WordSpecLike}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.language.postfixOps
+import org.pactDemo.finatraUtilities.Futures._
 
-class SupervisourPactActorSpec3 extends TestKit(ActorSystem("MySpec"))
+class SupervisoryPactActorAsActorSpec extends TestKit(ActorSystem("SupervisoryPactActorSpec3"))
   with ImplicitSender
   with WordSpecLike
   with BeforeAndAfterAll
   with BeforeAndAfter
   with Matchers
-  with PactDemoSpec2  {
+  with PactDemoSpec2 {
 
 
   val pactClient = mock[GenericCustomClient[CustomRequestObject, CustomReplyObject]]
@@ -34,6 +36,7 @@ class SupervisourPactActorSpec3 extends TestKit(ActorSystem("MySpec"))
 
   implicit val childActorFactory = new ChildActorFactory {
     var actor: ActorRef = null
+
     override def apply(context: ActorContext, id: Int, restClient: (CustomRequestObject) => Future[CustomReplyObject]): ActorRef = {
       actor = context.actorOf(Props(new RememberPactActor(restClient)), s"${id}-Processor")
       actor
@@ -42,19 +45,19 @@ class SupervisourPactActorSpec3 extends TestKit(ActorSystem("MySpec"))
 
   implicit val json = mock[Json]
 
-  val superPactActor = system.actorOf(Props(new SupervisourPactActor(pactClient)), "Supervisour-Process")
+  val superPactActor = system.actorOf(Props(new SupervisoryPactActor(pactClient)), "Supervisour-Process")
 
   "SupervisourPactActor create a child pact and send it the message" should {
 
     "send back Sucessful response for valid request" in {
       when(json.fromJson[CustomRequestObject]("some input")) thenReturn CustomRequestObject(1, "validToken")
-      //val inputRequest = processRequest.input ~> json.fromJson[CustomRequestObject]
 
       val future = superPactActor ? ProcessRequest("some input")
-      val result: ProviderResponse =  Await.result(future, timeout.duration).asInstanceOf[ProviderResponse]
-      val rememberedActor = childActorFactory.actor.asInstanceOf[RememberPactActor]
-      rememberedActor.rememberedRequest shouldBe CustomRequest(CustomRequestObject(1, "validToken"))
-      rememberedActor.restClient shouldBe pactClient
+      Await.result(future, timeout.duration) shouldBe "responseFromRememberPactActor"
+      val (client, request) = Await.result((childActorFactory.actor ? RememberedDetails), timeout.duration)
+
+      request shouldBe CustomRequest(CustomRequestObject(1, "validToken"))
+      client shouldBe pactClient
     }
   }
 }

@@ -14,7 +14,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 
-class SupervisourPactActorSpec2 extends TestKit(ActorSystem("MySpec"))
+class CustomRequestProcessActorSpec extends TestKit(ActorSystem("CustomRequestProcessActorSpec"))
   with ImplicitSender
   with WordSpecLike
   with BeforeAndAfterAll

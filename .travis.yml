@@ -3,7 +3,7 @@ scala:
 - 2.11.8
 jdk:
 - oraclejdk8
-script: sbt ++$TRAVIS_SCALA_VERSION pactTest
+script: sbt ++$TRAVIS_SCALA_VERSION clean pactTest
 after_success:
 - '[[ $TRAVIS_BRANCH == "master" ]] && { sbt publishLocal publish; };'
 - 'echo " Username - $PACT_BROKER_USERNAME  password - $PACT_BROKER_PASSWORD" '

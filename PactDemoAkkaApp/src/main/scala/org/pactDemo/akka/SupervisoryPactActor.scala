@@ -63,26 +63,28 @@ trait AkkaPactSystemCommandExecutor {
 }
 
 trait ChildActorFactory {
-  def apply(context: ActorContext,id: Int, restClient: CustomRequestObject => Future[CustomReplyObject]) : ActorRef
+  def apply(context: ActorContext, id: Int, restClient: CustomRequestObject => Future[CustomReplyObject]): ActorRef
 }
 
 object ChildActorFactory {
+
   implicit object defaultChildActorFactory extends ChildActorFactory {
-    override def apply(context: ActorContext,id: Int, restClient: CustomRequestObject => Future[CustomReplyObject]) : ActorRef = {
+    override def apply(context: ActorContext, id: Int, restClient: CustomRequestObject => Future[CustomReplyObject]): ActorRef = {
       context.actorOf(Props(new CustomRequestProcessActor(restClient)), s"${id}-Processor")
     }
   }
+
 }
 
-class SupervisourPactActor(restClient: CustomRequestObject => Future[CustomReplyObject])(implicit childActorFactory : ChildActorFactory, json: Json) extends Actor with PactArrow {
+class SupervisoryPactActor(restClient: CustomRequestObject => Future[CustomReplyObject])(implicit childActorFactory: ChildActorFactory, json: Json) extends Actor with PactArrow {
 
   println(s"object create :: ${restClient} // ${childActorFactory}")
 
   implicit val timeout = Timeout(5 second)
 
-  def processRequest(processRequest: ProcessRequest): ActorRef = {
+  def processRequest(properSender: ActorRef, processRequest: ProcessRequest): ActorRef = {
 
-    println(" start of processRequest \n")
+    println(s" start of processRequest properSender: $properSender sender $sender()\n")
 
     val inputRequest = processRequest.input ~> json.fromJson[CustomRequestObject]
 
@@ -97,12 +99,7 @@ class SupervisourPactActor(restClient: CustomRequestObject => Future[CustomReply
 
     //requestProcessor ! CustomRequest(inputRequest)
     val x: concurrent.Future[Any] = (requestProcessor ? CustomRequest(inputRequest))
-      x.foreach[Any]{ x =>
-        println(s"request back : ${x}")
-        println(s"sender : ${sender()}")
-        sender() ! x
-      }
-
+    x.foreach[Any] { x => properSender ! x }
     requestProcessor
   }
 
@@ -112,20 +109,24 @@ class SupervisourPactActor(restClient: CustomRequestObject => Future[CustomReply
   }
 
   override def receive: Receive = {
-    case p: ProcessRequest => processRequest(p)
+    case p: ProcessRequest =>
+      println(s"In SupervisourPactActor.receive  ${sender()}")
+      processRequest(sender(), p)
     case CloseProcess => closeProcess
   }
 }
 
 trait ProviderResponse
-case object ProviderSuccessful extends  ProviderResponse
-case object ProviderFailure extends  ProviderResponse
+
+case object ProviderSuccessful extends ProviderResponse
+
+case object ProviderFailure extends ProviderResponse
 
 class CustomRequestProcessActor(restClient: CustomRequestObject => Future[CustomReplyObject]) extends Actor with PactArrow {
 
   override def receive: Receive = {
     case CustomRequest(request) =>
-
+      println(s"In CustomRequestProcessActor  ${sender()}")
       try {
         val pureResponse = restClient(request)
         pureResponse.onSuccess(x => {
@@ -142,14 +143,13 @@ class CustomRequestProcessActor(restClient: CustomRequestObject => Future[Custom
         case e: Exception => sender ! ProviderFailure
       }
     case x =>
-          sender ! ProviderFailure
+      sender ! ProviderFailure
 
   }
 }
 
 
-
-object SupervisourPactActor {
+object SupervisoryPactActor {
 
   def akkaProcessing(host: String, port: String) = {
     val system = ActorSystem("AkkaPactSystem")
@@ -157,7 +157,7 @@ object SupervisourPactActor {
     val rawHttpClient = Http.newService(host + ":" + port)
     val restClient = new GenericCustomClient[CustomRequestObject, CustomReplyObject](rawHttpClient)
 
-    val mainProcess: ActorRef = system.actorOf(Props(new SupervisourPactActor(restClient)), "Main-Process")
+    val mainProcess: ActorRef = system.actorOf(Props(new SupervisoryPactActor(restClient)), "Main-Process")
 
     mainProcess ! ProcessRequest("""{"id": 1, "token":"12345-valid-for-id-1-token"}""")
     mainProcess ! ProcessRequest("""{"id": 2, "token":"54321-invalid-for-id-2-token"}""")

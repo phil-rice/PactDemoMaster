@@ -7,7 +7,7 @@ import org.pactDemo.akka.CustomRequestObject.ToRequestForCustomRequestObject
 import org.pactDemo.finatraUtilities.Json
 import org.pactDemo.utilities.PactDemoSpec
 
-class SupervisourPactActorSpec extends PactDemoSpec {
+class SupervisoryPactActorSpec extends PactDemoSpec {
 
   import org.mockito.Mockito._
 
