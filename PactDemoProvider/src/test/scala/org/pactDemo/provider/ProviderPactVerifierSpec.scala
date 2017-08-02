@@ -26,14 +26,6 @@ class ProviderPactVerifierSpec extends FinatraControllerSpec {
       .runVerificationAgainst("localhost", server.httpExternalPort)
   }
 
-
-
-
-
-
-
-
-
   it should "Meet its temp pacts with Android" in {
     verifyPact
       .withPactSource(loadFromLocal("tmp/pacts/android.json"))
