@@ -37,15 +37,15 @@ class SupervisoryPactActorAsActorSpec extends TestKit(ActorSystem("SupervisoryPa
   implicit val childActorFactory = new ChildActorFactory {
     var actor: ActorRef = null
 
-    override def apply(context: ActorContext, id: Int, restClient: (CustomRequestObject) => Future[CustomReplyObject]): ActorRef = {
-      actor = context.actorOf(Props(new RememberPactActor(restClient)), s"${id}-Processor")
+    override def apply(context: ActorContext, id: Int): ActorRef = {
+      actor = context.actorOf(Props(new RememberPactActor(pactClient)), s"${id}-Processor")
       actor
     }
   }
 
   implicit val json = mock[Json]
 
-  val superPactActor = system.actorOf(Props(new SupervisoryPactActor(pactClient)), "Supervisour-Process")
+  val superPactActor = system.actorOf(Props(new SupervisoryPactActor(pactClient,childActorFactory)), "Supervisour-Process")
 
   "SupervisourPactActor create a child pact and send it the message" should {
 
