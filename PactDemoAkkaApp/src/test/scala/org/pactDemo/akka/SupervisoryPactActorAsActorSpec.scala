@@ -14,6 +14,8 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import org.pactDemo.finatraUtilities.Futures._
+import scala.language.postfixOps
+import scala.language.reflectiveCalls
 
 class SupervisoryPactActorAsActorSpec extends TestKit(ActorSystem("SupervisoryPactActorSpec3"))
   with ImplicitSender

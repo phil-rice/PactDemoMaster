@@ -40,6 +40,12 @@ trait LogMe {
   }
 }
 
+object NullLogMe extends LogMe {
+  override def debug(name: String, s: String, e: Option[Throwable]): Unit = {}
+
+  override def info(name: String, s: String, e: Option[Throwable]): Unit = {}
+}
+
 object PrintlnLogMe extends LogMe {
   override def debug(name: String, s: String, e: Option[Throwable]): Unit = println(name + " " + s + " " + e.getOrElse(""))
 

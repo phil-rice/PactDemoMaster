@@ -14,3 +14,16 @@ class GenericCustomClient[CustomRequest, CustomResponse](delegate: Request => Fu
 
   }
 }
+
+trait GenericCustomClientLanguageExtension extends ServiceLanguageExtension {
+  def objectify[Req, Res](implicit toRequest: ToRequest[Req],
+                          fromResponse: FromResponse[Req, Res]):
+  ServiceTransformer[Request, Response, Req, Res] = { childTree =>
+    val x: ServiceTree[Request, Response, ServiceDescriptionAndCreator[Request, Response]] = childTree
+    TransformerTree0[Request, Response, Req, Res, ServiceDescriptionAndCreator[Req, Res]](
+      childTree,
+      ServiceDescriptionAndCreator[Req, Res](s"GenericCustomClient",
+        () => new GenericCustomClient[Req, Res](childTree.payload.service)))
+  }
+}
+

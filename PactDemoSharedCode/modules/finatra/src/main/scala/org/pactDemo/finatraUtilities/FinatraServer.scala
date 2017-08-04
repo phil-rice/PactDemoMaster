@@ -12,7 +12,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.http.{Controller, HttpServer}
 import org.pactDemo.utilities.Heroku
 
-/** Admin port is at port +1 */
+
 class FinatraServer(defaultPort: Int, controllers: Controller*) extends HttpServer {
 
 
