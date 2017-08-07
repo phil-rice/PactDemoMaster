@@ -7,7 +7,7 @@ trait SimpleTree[T] {
 }
 
 case class SimpleTreeRoot[T](payload: T) extends SimpleTree[T] {
-  override def map[T1](fn: (T) => T1): SimpleTree[T1] = SimpleTreeRoot(fn(t))
+  override def map[T1](fn: (T) => T1): SimpleTree[T1] = SimpleTreeRoot(fn(payload))
 
   override def fold: List[T] = List(payload)
 }

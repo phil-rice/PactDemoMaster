@@ -4,11 +4,12 @@ import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.util.Future
 import org.mockito.Mockito._
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer}
+import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer, NullSl4jLoggingAdapter}
 import org.pactDemo.utilities.PactDemoSpec
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FeatureSpec}
 
 class AndroidProviderSpec extends FinatraControllerSpec with BeforeAndAfter {
+  implicit val loggingAdapter = NullSl4jLoggingAdapter
 
   val fakeProvider = mock[IdAndToken => Future[IdTokenAndValid]]
 

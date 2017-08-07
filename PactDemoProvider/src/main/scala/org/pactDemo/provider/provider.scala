@@ -6,7 +6,7 @@ import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
 import org.pactDemo.finatraUtilities._
-import org.pactDemo.utilities.PrintlnLogMe
+import FinagleLogMe
 
 
 case class AuthenticationRequestWithPrefixBody(`Authentication-token`: String) {
@@ -94,7 +94,7 @@ class ProviderController(authenticationService: AuthenticationRequest => Future[
 
 
 object Provider extends App {
-  implicit val logger = PrintlnLogMe
+  implicit val logger = FinagleLogMe
 
   new FinatraServer(9000, new ProviderController(new LoggingClient[AuthenticationRequest, AuthenticationResult]("AuthenticationService", "", new AuthenticationService)), new AssetsController).main(Array())
 }

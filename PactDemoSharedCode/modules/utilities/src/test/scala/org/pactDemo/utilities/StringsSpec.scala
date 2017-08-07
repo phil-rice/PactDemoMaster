@@ -24,6 +24,11 @@ class StringsSpec extends PactDemoSpec {
     Strings.lastSegmentOf("a/b/c/d/") shouldBe "d"
   }
 
+  "Strings.ellipse" should "return the string if the length is less than the number" in {
+    Strings.ellipses(3)("") shouldBe ""
+    Strings.ellipses(3)("abc") shouldBe "abc"
+    Strings.ellipses(3)("abcd") shouldBe "abc.."
+  }
 }
 
 

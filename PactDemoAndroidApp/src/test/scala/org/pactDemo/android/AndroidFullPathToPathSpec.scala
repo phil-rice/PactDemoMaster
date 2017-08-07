@@ -2,12 +2,14 @@ package org.pactDemo.android
 
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Status
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, GenericCustomClient, MutableService}
+import org.pactDemo.finatraUtilities.{FinatraControllerSpec, GenericCustomClient, MutableService, NullSl4jLoggingAdapter}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 
 class AndroidFullPathToPathSpec extends FinatraControllerSpec with BeforeAndAfterAll with BeforeAndAfter {
+  implicit val loggingAdapter = NullSl4jLoggingAdapter
 
   val provider = new MutableService[IdAndToken, IdTokenAndValid]
+
   def controllerUnderTest = new AndroidProviderController(provider)
 
   after {

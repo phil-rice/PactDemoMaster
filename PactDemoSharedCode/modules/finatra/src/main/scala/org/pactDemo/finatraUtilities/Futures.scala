@@ -1,7 +1,6 @@
 package org.pactDemo.finatraUtilities
 
 import com.twitter.util._
-import org.pactDemo.utilities.{Failed, LogData}
 
 object Futures {
 

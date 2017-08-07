@@ -19,8 +19,7 @@ class AddHostNameService(hostName: String, delegate: Request => Future[Response]
 trait AddHostNameServiceLanguageExtension extends ServiceLanguageExtension {
 
   def addHostName[OldService <: Request => Future[Response]](hostName: String): ServiceDelegator[Request, Response] = { oldTree =>
-    DelegateTree0[Request, Response, ServiceDescriptionAndCreator[Request, Response]](oldTree,
-      ServiceDescriptionAndCreator[Request, Response](
-        s"AddHostNameService($hostName)", () => new AddHostNameService(hostName, oldTree.payload.service)))
+    DelegateTree0[Request, Response, ServiceDescription](oldTree,
+      ServiceDescription(s"AddHostNameService($hostName)"), new AddHostNameService(hostName, _))
   }
 }
