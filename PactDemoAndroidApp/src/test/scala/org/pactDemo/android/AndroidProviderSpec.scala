@@ -13,6 +13,8 @@ class AndroidProviderSpec extends FinatraControllerSpec with BeforeAndAfter {
 
   val fakeProvider = mock[IdAndToken => Future[IdTokenAndValid]]
 
+  import org.pactDemo.mustache.Mustache._
+
   def controllerUnderTest = new AndroidProviderController(fakeProvider)
 
   before {

@@ -180,8 +180,8 @@ lazy val provider = (project in file("PactDemoProvider")).
   enablePlugins(JavaAppPackaging)
 
 lazy val mustache = (project in file("mustache")).
-  dependsOn(appUtilities % "test->test;compile->compile").
-  aggregate(appUtilities).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities).
+  aggregate(appUtilities, finatraUtilities).
   settings(commonSettings: _*).
   settings(mustacheSettings: _*)
 

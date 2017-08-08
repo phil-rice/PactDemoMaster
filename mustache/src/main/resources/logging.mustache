@@ -1,0 +1,16 @@
+<html>
+<head><title>{{title}}</title></head>
+<body>
+<h1>Response is</h1>
+{{contentString}}
+<h1>Statuscode was</h1>
+{{statusCode}}
+<h1>Logging</h1>
+<table>
+    <tr><th>Time</th><th>Logging Level</th><th>Log Message</th></tr>
+    {{#loggingRecord}}
+        <tr><td>{{time}}</td><td>{{level}}</td><td>{{message}}</td></tr>
+    {{/loggingRecord}}
+</table>
+</body>
+</html>

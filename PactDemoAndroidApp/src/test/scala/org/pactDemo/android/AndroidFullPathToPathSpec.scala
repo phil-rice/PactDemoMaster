@@ -9,7 +9,7 @@ class AndroidFullPathToPathSpec extends FinatraControllerSpec with BeforeAndAfte
   implicit val loggingAdapter = NullSl4jLoggingAdapter
 
   val provider = new MutableService[IdAndToken, IdTokenAndValid]
-
+import org.pactDemo.mustache.Mustache._
   def controllerUnderTest = new AndroidProviderController(provider)
 
   after {

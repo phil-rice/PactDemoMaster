@@ -1,17 +1,14 @@
 package org.pactDemo.mustache
 
-import java.io.{StringReader, StringWriter}
+import java.io.StringWriter
 
 import com.github.mustachejava.{DefaultMustacheFactory, Mustache => JMustache}
 import com.twitter.mustache.ScalaObjectHandler
+import org.pactDemo.finatraUtilities.{TemplateItem, TemplateMaker}
 
-import scala.io.Source
-
-trait Mustache {
+trait Mustache extends TemplateMaker {
   val mf = new DefaultMustacheFactory()
   mf.setObjectHandler(new ScalaObjectHandler)
-
-//  def fromString(name: String, template: String): MustacheTemplate = new MustacheTemplate(mf.compile(new StringReader(template), name))
 
   def apply(location: String): MustacheTemplate = new MustacheTemplate(mf.compile(location))
 }
@@ -20,12 +17,13 @@ object Mustache extends Mustache {
 
   implicit val defaultMustache = this
 
+
 }
 
-class MustacheTemplate(mustache: JMustache) extends (Any => String) {
-  def apply(scope: Any): String = {
+class MustacheTemplate(mustache: JMustache) extends (TemplateItem => String) {
+  def apply(scope: TemplateItem): String = {
     val sw = new StringWriter
-    mustache.execute(sw, scope)
+    mustache.execute(sw, scope.contents)
     sw.close()
     sw.toString
   }

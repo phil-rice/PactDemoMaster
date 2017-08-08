@@ -7,7 +7,9 @@ import com.twitter.util.{Future, Return, Throw, Try}
 import scala.collection.concurrent.TrieMap
 import scala.collection.mutable
 
-case class LoggingReport[X](result: Try[X], records: mutable.MutableList[LoggingRecord])
+case class LoggingReport[X](result: Try[X], records: mutable.MutableList[LoggingRecord]) {
+  def map[T1](fn: X => T1) = LoggingReport(result.map(fn), records)
+}
 
 case class LoggingRecord(time: Long, level: PactLoggingLevel, name: String, msg: String, throwable: Option[Throwable])
 
