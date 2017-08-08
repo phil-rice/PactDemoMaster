@@ -15,8 +15,8 @@ class AkkaPactTest extends FunSpec with Matchers {
 
     it("should be able to detect valid token - passing valid token") {
       forgePact
-        .between("AkkaClient")
-        .and("CustomerAndroid")
+        .between("AkkaActorClient")
+        .and("Android")
         .addInteraction(
           interaction
             .description("Validating valid request result")
@@ -35,8 +35,8 @@ class AkkaPactTest extends FunSpec with Matchers {
 
     it("should be able to detect invalid token - passing invalid token") {
       forgePact
-        .between("AkkaClient")
-        .and("CustomerAndroid")
+        .between("AkkaActorClient")
+        .and("Android")
         .addInteraction(
           interaction
             .description("Validating invalid request result")

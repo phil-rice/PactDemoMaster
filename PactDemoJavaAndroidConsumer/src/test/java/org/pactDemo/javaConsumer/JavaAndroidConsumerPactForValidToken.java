@@ -31,7 +31,7 @@ public class JavaAndroidConsumerPactForValidToken extends ConsumerPactTestMk2 {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("ContentType","application/hcl.token");
         return builder
-                .uponReceiving("JavaAndriodPact Test interaction 1")
+                .uponReceiving("Invalid token")
                 .path("/token/android/post")
                 .method("POST")
                 .body("{\"id\":2,\"token\":\"token invalid\"}","application/hcl.token")
@@ -43,16 +43,16 @@ public class JavaAndroidConsumerPactForValidToken extends ConsumerPactTestMk2 {
 
     @Override
     protected String providerName() {
-        return "AndriodProvider";
+        return "Android";
     }
 
     @Override
     protected String consumerName() {
-        return "JavaAndroidConsumerForValidToken";
+        return "JavaConsumer";
     }
 
     @Override
-    @PactVerification( "JavaAndroidConsumerPact1" )
+    @PactVerification( "Invalid token" )
     public void runTest( MockServer mockServer ) throws IOException {
         String url = mockServer.getUrl()+"/token/android/post";
         System.out.println("url1 => "+url);

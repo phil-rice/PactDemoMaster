@@ -22,8 +22,8 @@ import org.pactDemo.mustache.Mustache._
 
   it should "should be able to detect valid token - passing valid token" in {
     forgePact
-      .between("CustomerAndroid")
-      .and("Provider")
+      .between("Android")
+      .and("RawProvider")
       .addInteraction(
         interaction
           .description("Validating valid request result")
@@ -49,8 +49,8 @@ import org.pactDemo.mustache.Mustache._
 
   it should "be able to detect invalid token - passing invalid token" in {
     forgePact
-      .between("CustomerAndroid")
-      .and("Provider")
+      .between("Android")
+      .and("RawProvider")
       .addInteraction(
         interaction
           .description("Validating invalid request result")

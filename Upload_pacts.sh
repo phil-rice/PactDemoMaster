@@ -19,18 +19,35 @@ curl -X DELETE \
 # #####################################
 #	Update PACT files
 # #####################################
-	
+
+
+
 curl -X PUT \
-  https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomerIos/version/1.0.0 \
+  https://hcl.pact.dius.com.au/pacts/provider/RawProvider/consumer/Android/version/1.0.0 \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
   -u $username:$password \
-  -d @./target/pacts/CustomerIos_Provider.json
+  -d @./target/pacts/Android_RawProvider.json
 
 
 curl -X PUT \
-    https://hcl.pact.dius.com.au/pacts/provider/Provider/consumer/CustomerAndroid/version/1.0.0 \
+    https://hcl.pact.dius.com.au/pacts/provider/RawProvider/consumer/Ios/version/1.0.0 \
     -H 'cache-control: no-cache' \
     -H 'content-type: application/json' \
     -u $username:$password \
-    -d @./target/pacts/CustomerAndroid_Provider.json
+    -d @./target/pacts/Ios_RawProvider.json
+
+curl -X PUT \
+    https://hcl.pact.dius.com.au/pacts/provider/Android/consumer/AkkaActorClient/version/1.0.0 \
+    -H 'cache-control: no-cache' \
+    -H 'content-type: application/json' \
+    -u $username:$password \
+    -d @./target/pacts/AkkaActorClient_Android.json
+
+
+curl -X PUT \
+    https://hcl.pact.dius.com.au/pacts/provider/Android/consumer/JavaConsumer/version/1.0.0 \
+    -H 'cache-control: no-cache' \
+    -H 'content-type: application/json' \
+    -u $username:$password \
+    -d @./target/pacts/JavaConsumer_Android.json

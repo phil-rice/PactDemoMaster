@@ -15,8 +15,8 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
 
     it("should be able to detect valid token - passing valid token") {
       forgePact
-        .between("CustomerIos")
-        .and("Provider")
+        .between("Ios")
+        .and("RawProvider")
         .addInteraction(
           interaction
             .description("Validating valid request result")
@@ -36,8 +36,8 @@ class GenericIosConsumerPact extends FunSpec with Matchers {
 
     it("should be able to detect invalid token - passing invalid token") {
       forgePact
-        .between("CustomerIos")
-        .and("Provider")
+        .between("Ios")
+        .and("RawProvider")
         .addInteraction(
           interaction
             .description("Validating invalid request result")
