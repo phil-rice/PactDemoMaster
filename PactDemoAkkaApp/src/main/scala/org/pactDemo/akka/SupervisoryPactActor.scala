@@ -60,12 +60,8 @@ object CustomReplyObject {
 
 case class CustomRequest(param: CustomRequestObject)
 
-trait AkkaPactSystemCommandExecutor {
-
-}
-
 trait ChildActorFactory {
-  def apply(context: ActorContext, id: Int): ActorRef
+  def apply(context: ActorContext): ActorRef
 }
 
 object ChildActorFactory {
@@ -81,33 +77,23 @@ object ChildActorFactory {
 class PooledACtorFactory(numberOfActors: Int, restClient: CustomRequestObject => Future[CustomReplyObject]) extends ChildActorFactory {
   val pool = RoundRobinPool.apply(numberOfActors).props(Props(new CustomRequestProcessActor(restClient)))
 
-  def apply(context: ActorContext, id: Int): ActorRef = {
-    context.actorOf(pool, s"${id}-Processor")
+  def apply(context: ActorContext): ActorRef = {
+    context.actorOf(pool, "child-actor-Processor")
   }
 }
 
 class SupervisoryPactActor(restClient: CustomRequestObject => Future[CustomReplyObject], childActorFactory: ChildActorFactory)(implicit json: Json) extends Actor with PactArrow {
 
-  println(s"object create :: ${restClient} // ${childActorFactory}")
-
   implicit val timeout = Timeout(5 second)
+
+  val requestProcessor: ActorRef = childActorFactory(context)
 
   def processRequest(properSender: ActorRef, processRequest: ProcessRequest): ActorRef = {
 
-    println(s" start of processRequest properSender: $properSender sender $sender()\n")
-
     val inputRequest = processRequest.input ~> json.fromJson[CustomRequestObject]
-
-    //val requestProcessor: ActorRef = context.actorOf(Props(new CustomRequestProcessActor(restClient)), s"${inputRequest.id}-Processor")
-
-    val requestProcessor: ActorRef = childActorFactory(context, inputRequest.id)
-
-    //implicit val executionContext : ExecutionContext = ???
 
     import context.dispatcher
 
-
-    //requestProcessor ! CustomRequest(inputRequest)
     val x: concurrent.Future[Any] = (requestProcessor ? CustomRequest(inputRequest))
     x.foreach[Any] { x => properSender ! x }
     requestProcessor
@@ -120,7 +106,6 @@ class SupervisoryPactActor(restClient: CustomRequestObject => Future[CustomReply
 
   override def receive: Receive = {
     case p: ProcessRequest =>
-      println(s"In SupervisourPactActor.receive  ${sender()}")
       processRequest(sender(), p)
     case CloseProcess => closeProcess
   }
@@ -138,11 +123,10 @@ object CustomRequestProcessActor {
 
 class CustomRequestProcessActor(restClient: CustomRequestObject => Future[CustomReplyObject]) extends Actor with PactArrow {
   CustomRequestProcessActor.count.incrementAndGet()
-  println(s"In CustomRequestProcessActor ${ CustomRequestProcessActor.count}")
 
   override def receive: Receive = {
     case CustomRequest(request) =>
-      println(s"In CustomRequestProcessActor  ${sender()}")
+
       try {
         val pureResponse = restClient(request)
         pureResponse.onSuccess(x => {
@@ -172,22 +156,13 @@ object SupervisoryPactActor {
     val rawHttpClient = Http.newService(host + ":" + port)
     val restClient = new GenericCustomClient[CustomRequestObject, CustomReplyObject](rawHttpClient)
     val childActorFactory = new PooledACtorFactory(numberOfChildActors, restClient)
-    println("Count1: " + CustomRequestProcessActor.count)
     val mainProcess: ActorRef = system.actorOf(Props(new SupervisoryPactActor(restClient, childActorFactory)), "Main-Process")
 
     mainProcess ! ProcessRequest("""{"id": 1, "token":"12345-valid-for-id-1-token"}""")
     mainProcess ! ProcessRequest("""{"id": 2, "token":"54321-invalid-for-id-2-token"}""")
-    println("Count2: " + CustomRequestProcessActor.count)
-
-
-    //  implicit val timeout = Timeout(5 seconds)
-    //  val future = mainProcess ? ProcessRequest("""{"id": 1, "token":"12345-valid-for-id-1-token"}""") // enabled by the “ask” import
-    //  val result = Await.result(future, timeout.duration).asInstanceOf[Future[CustomReplyObject]]
-
-    //  result.onSuccess(println(_))
 
     Thread.sleep(5000)
-    println("Count3: " + CustomRequestProcessActor.count)
+
     mainProcess ! CloseProcess
   }
 

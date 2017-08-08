@@ -37,8 +37,8 @@ class SupervisoryPactActorAsActorSpec extends TestKit(ActorSystem("SupervisoryPa
   implicit val childActorFactory = new ChildActorFactory {
     var actor: ActorRef = null
 
-    override def apply(context: ActorContext, id: Int): ActorRef = {
-      actor = context.actorOf(Props(new RememberPactActor(pactClient)), s"${id}-Processor")
+    override def apply(context: ActorContext): ActorRef = {
+      actor = context.actorOf(Props(new RememberPactActor(pactClient)), "child-actor-Processor")
       actor
     }
   }
