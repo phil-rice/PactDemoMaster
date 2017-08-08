@@ -33,20 +33,44 @@ trait RequestResponse {
 
   import PactArrow._
 
-  implicit object TemplateableForResponse extends Templateable[LoggingReport[Response]] {
-    override def apply(v1: LoggingReport[Response]): TemplateItem = {
-      val mainMap = v1.result match {
-        case Return(response) => Map("statusCode" -> response.status.code, "contentString" -> response.contentString, "contentType" -> response.contentType)
-        case Throw(e) => Map("statusCode" -> "Threw exception", "contentString" -> e.toString, "contentType" -> "None")
-      }
-      val firstTime = v1.records.map(_.time).min
+  implicit object TemplateableForResponse extends Templateable[Response] {
+    override def apply(response: Response): TemplateItem = TemplateItem(Map("statusCode" -> response.status.code, "contentString" -> response.contentString, "contentType" -> response.contentType))
+  }
 
-      val loggingRecordsMap = v1.records.map(logginRecord => Map(
-        "time" -> (logginRecord.time - firstTime)/1000000,
+  implicit object TemplateableForException extends Templateable[Throwable] {
+    override def apply(e: Throwable): TemplateItem = TemplateItem(Map("statusCode" -> "Threw exception", "contentString" -> e.toString, "contentType" -> "None"))
+  }
+
+  implicit object TemplateableForLoggingRecords extends Templateable[Iterable[LoggingRecord]] {
+    override def apply(records: Iterable[LoggingRecord]): TemplateItem = {
+      val firstTime = records.map(_.time).min
+      TemplateItem(records.map(logginRecord => Map(
+        "time" -> (logginRecord.time - firstTime) / 1000000,
         "level" -> logginRecord.level,
         "message" -> logginRecord.msg
-      ))
-      TemplateItem(mainMap ++ Map("loggingRecord" -> loggingRecordsMap, "title" -> "someTitle"))
+      )))
+    }
+  }
+
+
+  implicit def templateableForResponse(implicit templateableForResponse: Templateable[Response], templateableForException: Templateable[Throwable], templatebleForLoggingeRcord: Templateable[Iterable[LoggingRecord]]) = new Templateable[LoggingReport[Response]] {
+    override def apply(v1: LoggingReport[Response]): TemplateItem = {
+      val mainData: TemplateItem = v1.result match {
+        case Return(response) => templateableForResponse(response)
+        case Throw(e) => templateableForException(e)
+      }
+      val loggingRecordsData = templatebleForLoggingeRcord(v1.records)
+      val result = TemplateItem(Map("result" -> mainData.contents, "logging"-> loggingRecordsData.contents))
+      println
+      println
+      println
+      println
+      println(result)
+      println
+      println
+      println
+      println
+      result
     }
   }
 
