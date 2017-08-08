@@ -23,7 +23,7 @@ trait PactArrow  {
 
   private def debug[T, T1](t: T, t1: => T1)(implicit pactlogger: Pactlogger): T1 = {
     val result = Try(t1)
-    pactlogger(s"Arrow. Input $t Output $result")
+    pactlogger(s"Arrow ${}. Input $t Output $result")
     result.get
   }
 

@@ -6,7 +6,7 @@ import com.twitter.finagle.http.filter.Cors
 import com.twitter.finagle.http.filter.Cors.HttpFilter
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
-import com.twitter.finatra.http.filters.{CommonFilters, ExceptionMappingFilter}
+import com.twitter.finatra.http.filters.{CommonFilters, ExceptionMappingFilter, LoggingMDCFilter}
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.finatra.http.{Controller, HttpServer}
@@ -31,6 +31,7 @@ class FinatraServer(defaultPort: Int, controllers: Controller*) extends HttpServ
     val raw = router.filter[CommonFilters]
       .filter(new HttpFilter(Cors.UnsafePermissivePolicy)) // Added CORS dependency to handle Cross-origin problem
       .filter[ExceptionMappingFilter[Request]]
+      .filter[LoggingMDCFilter[Request, Response]]
       .exceptionMapper[DebugURLExceptionMapper]
     controllers.foldLeft(raw)((acc, c) => acc.add(c))
   }

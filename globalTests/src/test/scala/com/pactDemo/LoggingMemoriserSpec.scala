@@ -1,6 +1,7 @@
-package org.pactDemo.finatraUtilities
+package com.pactDemo
 
 import com.twitter.util.{Future, Return, Throw}
+import org.pactDemo.finatraUtilities._
 import org.pactDemo.utilities.{MockNanoTimeService, PactDemoSpec}
 import Futures._
 

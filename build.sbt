@@ -16,10 +16,11 @@ val versions = new {
   val json4s = "3.5.2"
   val junit = "4.12"
   val guice = "4.0"
+  val logback = "1.2.3"
   val mockito = "1.10.19"
   val scalapact = "2.1.3"
   val scalatest = "3.0.1"
-  val scalate = "1.8.0"
+  val mustache = "0.9.5"
   val sl4j = "1.7.25"
 }
 lazy val commonSettings = Seq(
@@ -85,13 +86,13 @@ lazy val commonSettings = Seq(
   publishArtifact in Test := false
 )
 
-lazy val mustacheSettings = commonSettings ++ Seq(
-  libraryDependencies += "org.scalatra.scalate" % "scalate-core_2.11" % versions.scalate
+lazy val logbackSettings = Seq(
+  libraryDependencies += "ch.qos.logback" % "logback-classic" % versions.logback
 )
+
 
 lazy val finatraSettings = commonSettings ++ Seq(
   libraryDependencies += "com.twitter" %% "finatra-http" % versions.finatra,
-  libraryDependencies += "org.slf4j" % "slf4j-log4j12" % versions.sl4j,
   libraryDependencies += "com.twitter" %% "finatra-http" % versions.finatra % "test",
   libraryDependencies += "com.twitter" %% "inject-server" % versions.finatra % "test",
   libraryDependencies += "com.twitter" %% "inject-app" % versions.finatra % "test",
@@ -114,8 +115,12 @@ lazy val jsonSettings = Seq(
   libraryDependencies += "org.json4s" % "json4s-native_2.11" % versions.json4s
 )
 
+lazy val mustacheSettings = Seq(
+  libraryDependencies += "com.github.spullara.mustache.java" % "scala-extensions-2.11" % versions.mustache
+)
+
 lazy val pactConsumerSettings = finatraSettings ++ Seq(
-  libraryDependencies += "com.itv" %% "scalapact-scalatest" % versions.scalapact
+  libraryDependencies += "com.itv" %% "scalapact-scalatest" % versions.scalapact % "test"
 )
 
 lazy val akkaSettings = Seq(
@@ -134,6 +139,7 @@ lazy val appUtilities = (project in file("PactDemoSharedCode/modules/utilities")
 
 lazy val finatraUtilities = (project in file("PactDemoSharedCode/modules/finatra")).
   dependsOn(appUtilities % "test->test;compile->compile").aggregate(appUtilities).
+  //  settings(log4JSettingsForTest: _*).
   settings(jsonSettings: _*).
   settings(finatraSettings: _*)
 
@@ -145,8 +151,9 @@ lazy val javaAndroidApp = (project in file("PactDemoJavaAndroidConsumer")).
   enablePlugins(JavaAppPackaging)
 
 lazy val androidApp = (project in file("PactDemoAndroidApp")).
-  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities % "test->test;compile->compile").
-  aggregate(appUtilities, finatraUtilities).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities % "test->test;compile->compile", mustache).
+  aggregate(appUtilities, finatraUtilities, mustache).
+  settings(logbackSettings: _*).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
 lazy val akkaApp = (project in file("PactDemoAkkaApp")).
@@ -171,3 +178,15 @@ lazy val provider = (project in file("PactDemoProvider")).
   settings(finatraSettings: _*).
   settings(pactConsumerSettings: _*).
   enablePlugins(JavaAppPackaging)
+
+lazy val mustache = (project in file("mustache")).
+  dependsOn(appUtilities % "test->test;compile->compile").
+  aggregate(appUtilities).
+  settings(commonSettings: _*).
+  settings(mustacheSettings: _*)
+
+lazy val globalTests = (project in file("globalTests")).
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities % "test->test;compile->compile").
+  aggregate(appUtilities, finatraUtilities).
+  settings(logbackSettings: _*).
+  settings(commonSettings: _*)

@@ -2,7 +2,6 @@ package org.pactDemo.android
 
 import com.twitter.finagle.http.{Method, RequestBuilder}
 import com.twitter.io.Buf
-import org.pactDemo.android.IdAndToken
 import org.pactDemo.finatraUtilities.{FromRequest, ToRequest}
 import org.pactDemo.utilities.PactDemoSpec
 

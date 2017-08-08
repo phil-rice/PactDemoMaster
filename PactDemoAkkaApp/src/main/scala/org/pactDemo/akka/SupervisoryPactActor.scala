@@ -14,7 +14,7 @@ import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Method, Request, Response}
 import com.twitter.util.Future
 import org.pactDemo.finatraUtilities._
-
+import scala.language.postfixOps
 import scala.concurrent.{Await, ExecutionContext}
 
 

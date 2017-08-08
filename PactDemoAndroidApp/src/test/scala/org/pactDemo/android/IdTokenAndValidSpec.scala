@@ -1,7 +1,6 @@
 package org.pactDemo.android
 
 import com.twitter.finagle.http.{Response, Status}
-import org.pactDemo.android.{IdAndToken, IdTokenAndValid}
 import org.pactDemo.finatraUtilities.FromResponse
 import org.pactDemo.utilities.PactDemoSpec
 

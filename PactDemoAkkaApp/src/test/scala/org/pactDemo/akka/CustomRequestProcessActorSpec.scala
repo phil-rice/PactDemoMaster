@@ -12,7 +12,7 @@ import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Matchers, WordSpecLike}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
+import scala.language.postfixOps
 
 class CustomRequestProcessActorSpec extends TestKit(ActorSystem("CustomRequestProcessActorSpec"))
   with ImplicitSender
