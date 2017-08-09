@@ -165,7 +165,7 @@ lazy val akkaApp = (project in file("PactDemoAkkaApp")).
 
 
 lazy val iosApp = (project in file("PactDemoIosApp")).
-  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities % "test->test;compile->compile").
+  dependsOn(appUtilities % "test->test;compile->compile", finatraUtilities % "test->test;compile->compile", mustache).
   aggregate(appUtilities, finatraUtilities).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 

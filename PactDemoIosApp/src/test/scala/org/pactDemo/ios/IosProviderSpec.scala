@@ -4,11 +4,15 @@ import com.twitter.finagle.http.Status
 import com.twitter.inject.server.FeatureTestMixin
 import com.twitter.util.Future
 import org.mockito.Mockito._
-import org.pactDemo.finatraUtilities.FinatraControllerSpec
+import org.pactDemo.finatraUtilities.{FinatraControllerSpec, NullSl4jLoggingAdapter}
 import org.scalatest.BeforeAndAfter
 
 class IosProviderSpec extends FinatraControllerSpec with FeatureTestMixin with BeforeAndAfter {
 
+  import org.pactDemo.mustache.Mustache._
+
+  implicit val loggingAdapter = NullSl4jLoggingAdapter
+  
   val fakeProvider = mock[IosProviderRequest => Future[IosAuthResponse]]
 
   def controllerUnderTest = new IosProvider(fakeProvider)

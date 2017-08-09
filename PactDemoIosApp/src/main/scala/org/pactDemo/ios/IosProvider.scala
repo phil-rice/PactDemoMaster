@@ -7,6 +7,7 @@ import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.finatra.request.RouteParam
 import com.twitter.util.Future
 import org.pactDemo.finatraUtilities.{FinatraServer, _}
+import org.pactDemo.mustache.Mustache
 import org.pactDemo.utilities.{Heroku, Strings}
 
 case class AuthToken(`Authentication-token`: String)
@@ -74,12 +75,14 @@ object IosAuthResponse extends PactArrow {
 
 //case class IosRequest(@RouteParam id: Int, request: Request)
 
-class IosProvider(clientService: IosProviderRequest => Future[IosAuthResponse]) extends Controller with RequestResponse {
+class IosProvider(clientService: IosProviderRequest => Future[IosAuthResponse])(implicit templateMaker: TemplateMaker, loggingAdapter: LoggingAdapter) extends Controller with RequestResponse {
 
   import PactArrow._
-import Futures._
-  post("/token/id/:id") { request: Request =>
-    request ~> fromRequest[IosProviderRequest] ~> clientService ~> toResponse
+  import Futures._
+
+  post("/token/id/:id") { request: Request => request ~> fromRequest[IosProviderRequest] ~> clientService ~> toResponse }
+  post("/token/id/:id/debug") {
+    traceClient[IosProviderRequest, IosAuthResponse]("logging.mustache", clientService)
   }
 
   // Added options call to handle Cross-Origin problem
@@ -89,7 +92,11 @@ import Futures._
 }
 
 object IosProvider extends App {
-  val baseUrl =  Heroku.providerHostAndPort
+  implicit val adapter = FinagleLoggingAdapter
+  implicit val logger = new SimpleLogMe
+  import Mustache._
+
+  val baseUrl = Heroku.providerHostAndPort
   val rawHttpClient = Http.newService(baseUrl)
   val client = new GenericCustomClient[IosProviderRequest, IosAuthResponse](rawHttpClient)
   new FinatraServer(9030, new IosProvider(client), new AssetsController).main(Array())
