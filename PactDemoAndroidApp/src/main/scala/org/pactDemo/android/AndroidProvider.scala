@@ -22,13 +22,9 @@ object AndroidIOApp extends App with ServiceLanguage {
 
   import Mustache._
 
-  val baseUrl = Option(System.getenv("provider")).getOrElse("localhost:9000")
+  val baseUrl = Heroku.providerHostAndPort
 
-  val x = http(baseUrl) >--< logging("", "") >--< addHostName(baseUrl) >--< objectify[IdAndToken, IdTokenAndValid] >--< logging("", "")
+  val clientBuilder = http(baseUrl) >--< logging("", "") >--< addHostName(baseUrl) >--< objectify[IdAndToken, IdTokenAndValid] >--< logging("", "")
 
-
-  val Array(host, _) = baseUrl.split(":")
-  val rawHttpClient = new AddHostNameService(host, new LoggingClient[Request, Response]("ProviderHttp", "", Http.newService(baseUrl)))
-  val client = new LoggingClient[IdAndToken, IdTokenAndValid]("Provider", "", new GenericCustomClient[IdAndToken, IdTokenAndValid](rawHttpClient))
-  new FinatraServer(9090, new AndroidProviderController(x.service), new AssetsController).main(Array())
+   new FinatraServer(9090, new AndroidProviderController(clientBuilder.service), new AssetsController).main(Array())
 }

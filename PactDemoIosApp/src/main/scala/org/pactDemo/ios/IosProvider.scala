@@ -7,7 +7,7 @@ import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.finatra.request.RouteParam
 import com.twitter.util.Future
 import org.pactDemo.finatraUtilities.{FinatraServer, _}
-import org.pactDemo.utilities.Strings
+import org.pactDemo.utilities.{Heroku, Strings}
 
 case class AuthToken(`Authentication-token`: String)
 
@@ -89,7 +89,7 @@ import Futures._
 }
 
 object IosProvider extends App {
-  val baseUrl = Option(System.getenv("provider")).getOrElse("localhost:9000")
+  val baseUrl =  Heroku.providerHostAndPort
   val rawHttpClient = Http.newService(baseUrl)
   val client = new GenericCustomClient[IosProviderRequest, IosAuthResponse](rawHttpClient)
   new FinatraServer(9030, new IosProvider(client), new AssetsController).main(Array())

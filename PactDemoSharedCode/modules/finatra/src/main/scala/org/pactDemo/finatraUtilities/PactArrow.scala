@@ -17,13 +17,13 @@ object Pactlogger {
 
 }
 
-trait PactArrow  {
+trait PactArrow {
 
   protected var debugArrows = false
 
   private def debug[T, T1](t: T, t1: => T1)(implicit pactlogger: Pactlogger): T1 = {
     val result = Try(t1)
-    pactlogger(s"Arrow ${}. Input $t Output $result")
+    if (debugArrows) pactlogger(s"Arrow . Input $t Output $result")
     result.get
   }
 
@@ -32,7 +32,7 @@ trait PactArrow  {
   }
 
   implicit class FutureArrowPimper[T](t: Future[T])(implicit pactlogger: Pactlogger) {
-    def ~>[T1](fn: T => T1) =  t.map(x => debug(x, fn(x)))
+    def ~>[T1](fn: T => T1) = t.map(x => debug(x, fn(x)))
   }
 
 }

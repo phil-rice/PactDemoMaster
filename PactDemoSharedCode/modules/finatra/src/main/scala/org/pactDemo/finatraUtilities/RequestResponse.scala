@@ -60,17 +60,7 @@ trait RequestResponse {
         case Throw(e) => templateableForException(e)
       }
       val loggingRecordsData = templatebleForLoggingeRcord(v1.records)
-      val result = TemplateItem(Map("result" -> mainData.contents, "logging"-> loggingRecordsData.contents))
-      println
-      println
-      println
-      println
-      println(result)
-      println
-      println
-      println
-      println
-      result
+      TemplateItem(Map("result" -> mainData.contents, "logging"-> loggingRecordsData.contents))
     }
   }
 

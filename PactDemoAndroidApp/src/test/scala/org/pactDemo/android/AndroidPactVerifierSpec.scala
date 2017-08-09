@@ -2,10 +2,8 @@ package org.pactDemo.android
 
 
 import com.itv.scalapact.ScalaPactVerify._
-import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.util.Future
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer, NullSl4jLoggingAdapter}
-import org.scalatest.{BeforeAndAfterAll, FlatSpec}
+import org.pactDemo.finatraUtilities.{FinatraControllerSpec, NullSl4jLoggingAdapter}
 
 class AndroidPactVerifierSpec extends FinatraControllerSpec {
   implicit val loggingAdapter = NullSl4jLoggingAdapter
@@ -14,7 +12,7 @@ class AndroidPactVerifierSpec extends FinatraControllerSpec {
 
   class FakeAuthenticationService extends (IdAndToken => Future[IdTokenAndValid]) {
     override def apply(v1: IdAndToken): Future[IdTokenAndValid] = {
-      Future.value(if (v1.token.contains("invalid")) IdTokenAndValid(v1.id, v1.token, true) else IdTokenAndValid(v1.id, v1.token, false))
+      Future.value(if (v1.token.contains("invalid")) IdTokenAndValid(v1.id, v1.token, false) else IdTokenAndValid(v1.id, v1.token, true))
     }
   }
 
