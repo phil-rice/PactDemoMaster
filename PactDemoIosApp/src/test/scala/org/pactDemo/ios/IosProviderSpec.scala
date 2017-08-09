@@ -12,7 +12,7 @@ class IosProviderSpec extends FinatraControllerSpec with FeatureTestMixin with B
   import org.pactDemo.mustache.Mustache._
 
   implicit val loggingAdapter = NullSl4jLoggingAdapter
-  
+
   val fakeProvider = mock[IosProviderRequest => Future[IosAuthResponse]]
 
   def controllerUnderTest = new IosProvider(fakeProvider)

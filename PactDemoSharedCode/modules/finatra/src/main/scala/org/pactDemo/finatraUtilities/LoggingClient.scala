@@ -5,6 +5,8 @@ import java.util.{logging => javalog}
 import com.twitter.util.Future
 import org.pactDemo.utilities.SimpleTreeOneChild
 
+import scala.reflect.ClassTag
+
 class LoggingClient[Req, Res](name: String, prefix: String, delegate: Req => Future[Res])(implicit reqLog: LogData[Req], resLog: LogData[Res], log: LogMe) extends (Req => Future[Res]) {
   override def apply(req: Req): Future[Res] = {
     println(s"Logging client ${req} Log: $log TraceId ${log.traceId}")
@@ -18,7 +20,7 @@ class LoggingClient[Req, Res](name: String, prefix: String, delegate: Req => Fut
 
 trait LoggingClientServiceLanguageExtension extends ServiceLanguageExtension {
 
-  def logging[Req, Res, OldService <: Req => Future[Res]](name: String, prefix: String)(implicit reqLog: LogData[Req], resLog: LogData[Res], log: LogMe):
+  def logging[Req:ClassTag, Res:ClassTag, OldService <: Req => Future[Res]](name: String, prefix: String)(implicit reqLog: LogData[Req], resLog: LogData[Res], log: LogMe):
   ServiceDelegator[Req, Res] = { childTree =>
     DelegateTree0[Req, Res, ServiceDescription](
       childTree, ServiceDescription(

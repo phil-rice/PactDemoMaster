@@ -1,0 +1,19 @@
+<html>
+<head><title>{{title}}</title></head>
+<body>
+
+<h1>Structure</h1>
+<table>
+    <tr>
+        <th>Depth</th>
+        <th>Description</th>
+    </tr>
+    {{#structure}}
+        <tr>
+            <td>{{depth}}</td>
+            <td>{{{indent}}}{{description}}</td>
+        </tr>
+    {{/structure}}
+</table>
+</body>
+</html>

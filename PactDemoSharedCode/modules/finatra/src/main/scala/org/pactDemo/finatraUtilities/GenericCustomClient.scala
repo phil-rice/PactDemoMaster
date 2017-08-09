@@ -3,6 +3,8 @@ package org.pactDemo.finatraUtilities
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.util.Future
 
+import scala.reflect.ClassTag
+
 
 class GenericCustomClient[CustomRequest, CustomResponse](delegate: Request => Future[Response])
                                                         (implicit toRequest: ToRequest[CustomRequest],
@@ -16,7 +18,7 @@ class GenericCustomClient[CustomRequest, CustomResponse](delegate: Request => Fu
 }
 
 trait GenericCustomClientLanguageExtension extends ServiceLanguageExtension {
-  def objectify[Req, Res](implicit toRequest: ToRequest[Req],
+  def objectify[Req:ClassTag, Res:ClassTag](implicit toRequest: ToRequest[Req],
                           fromResponse: FromResponse[Req, Res]):
   ServiceTransformer[Request, Response, Req, Res] = { childTree =>
     val x: ServiceTree[Request, Response, ServiceDescription] = childTree

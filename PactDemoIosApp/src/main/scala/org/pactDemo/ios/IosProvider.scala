@@ -81,9 +81,7 @@ class IosProvider(clientService: IosProviderRequest => Future[IosAuthResponse])(
   import Futures._
 
   post("/token/id/:id") { request: Request => request ~> fromRequest[IosProviderRequest] ~> clientService ~> toResponse }
-  post("/token/id/:id/debug") {
-    traceClient[IosProviderRequest, IosAuthResponse]("logging.mustache", clientService)
-  }
+  post("/token/id/:id/debug")(traceClient[IosProviderRequest, IosAuthResponse]("logging.mustache", clientService))
 
   // Added options call to handle Cross-Origin problem
   options("/token/id/:*") { request: Request => response.ok }
@@ -94,6 +92,7 @@ class IosProvider(clientService: IosProviderRequest => Future[IosAuthResponse])(
 object IosProvider extends App {
   implicit val adapter = FinagleLoggingAdapter
   implicit val logger = new SimpleLogMe
+
   import Mustache._
 
   val baseUrl = Heroku.providerHostAndPort
