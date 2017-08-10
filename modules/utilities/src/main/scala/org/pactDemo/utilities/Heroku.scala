@@ -7,7 +7,7 @@ trait EnvStringGetter {
 object EnvStringGetter {
 
   implicit object EnvStringGetterFromEnv extends EnvStringGetter {
-    override def getEnv(name: String): Option[String] = Option(System.getenv("PORT"))
+    override def getEnv(name: String): Option[String] = Option(System.getenv(name))
   }
 
 }

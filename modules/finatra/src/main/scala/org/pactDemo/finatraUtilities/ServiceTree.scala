@@ -106,6 +106,6 @@ trait HttpServiceLanguageExtension {
   //  RootServiceCreator[Request, Response, Request => Future[Response]](s"FinagleHttp($hostNameAndPort)", () => Http.newService(hostNameAndPort))
 }
 
-trait ServiceLanguage extends HttpServiceLanguageExtension with GenericCustomClientLanguageExtension with AddHostNameServiceLanguageExtension with LoggingClientServiceLanguageExtension
+trait ServiceLanguage extends HttpServiceLanguageExtension with GenericCustomClientLanguageExtension with AddHostNameServiceLanguageExtension with LoggingClientServiceLanguageExtension with CacheServiceLanguage
 
 object ServiceLanguage extends ServiceLanguage

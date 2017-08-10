@@ -7,7 +7,8 @@ import com.twitter.util.Future
 import org.pactDemo.finatraUtilities._
 import org.pactDemo.mustache.{DisplayStructureController, Mustache, StatusController}
 import org.pactDemo.utilities._
-
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class AndroidProviderController(client: IdAndToken => Future[IdTokenAndValid])(implicit loggingAdapter: LoggingAdapter, templateMaker: TemplateMaker) extends Controller with RequestResponse with PactArrow {
   post("/token/android/post")(useClient[IdAndToken, IdTokenAndValid](client))
@@ -26,7 +27,7 @@ object AndroidIOApp extends App with ServiceLanguage {
   val baseUrl = Heroku.providerHostAndPort
   println(s"Base url for provider is $baseUrl")
 
-  val clientBuilder = http(baseUrl) >--< logging("providerHttp", "") >--< addHostName(baseUrl) >--< objectify[IdAndToken, IdTokenAndValid] >--< logging("providerIdAndToken", "")
+  val clientBuilder = http(baseUrl) >--< logging("providerHttp", "") >--< addHostName(baseUrl) >--< objectify[IdAndToken, IdTokenAndValid] >--< logging("providerIdAndToken", "") >--< caching(100, 1 minute)
 
   new FinatraServer(9090, new StatusController("status.mustache", clientBuilder), new DisplayStructureController("structure.mustache", clientBuilder), new AndroidProviderController(clientBuilder.service), new AssetsController).main(Array())
 }
