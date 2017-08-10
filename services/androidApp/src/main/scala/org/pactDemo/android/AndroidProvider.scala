@@ -27,7 +27,7 @@ object AndroidIOApp extends App with ServiceLanguage {
   val baseUrl = Heroku.providerHostAndPort
   println(s"Base url for provider is $baseUrl")
 
-  val clientBuilder = http(baseUrl) >--< logging("providerHttp", "") >--< addHostName(baseUrl) >--< objectify[IdAndToken, IdTokenAndValid] >--< logging("providerIdAndToken", "") >--< caching(100, 1 minute)
+  val clientBuilder = http(baseUrl) >--< logging("providerHttp", "") >--< addHostName(baseUrl) >--< objectify[IdAndToken, IdTokenAndValid] >--< logging("providerIdAndToken", "")
 
   new FinatraServer(9090, new StatusController("status.mustache", clientBuilder), new DisplayStructureController("structure.mustache", clientBuilder), new AndroidProviderController(clientBuilder.service), new AssetsController).main(Array())
 }
