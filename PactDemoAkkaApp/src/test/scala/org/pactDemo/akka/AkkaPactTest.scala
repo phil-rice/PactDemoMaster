@@ -4,9 +4,7 @@ import com.twitter.finagle.Http
 import org.pactDemo.finatraUtilities.GenericCustomClient
 import org.scalatest.{FunSpec, Matchers}
 import org.pactDemo.finatraUtilities.Futures._
-/**
-  * Created by aban.m on 04-07-2017.
-  */
+
 class AkkaPactTest extends FunSpec with Matchers {
 
   import com.itv.scalapact.ScalaPactForger._

@@ -7,7 +7,7 @@ import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.finatra.request.RouteParam
 import com.twitter.util.Future
 import org.pactDemo.finatraUtilities.{FinatraServer, _}
-import org.pactDemo.mustache.Mustache
+import org.pactDemo.mustache.{DisplayStructureController, Mustache, StatusController}
 import org.pactDemo.utilities.{Heroku, Strings}
 
 case class AuthToken(`Authentication-token`: String)
@@ -89,14 +89,14 @@ class IosProvider(clientService: IosProviderRequest => Future[IosAuthResponse])(
   get("/:*") { request: Request => response.ok.fileOrIndex(request.getParam("*"), "index.html") }
 }
 
-object IosProvider extends App {
+object IosProvider extends App with ServiceLanguage {
   implicit val adapter = FinagleLoggingAdapter
   implicit val logger = new SimpleLogMe
 
   import Mustache._
-
+  import org.pactDemo.mustache.DisplayStructure._
   val baseUrl = Heroku.providerHostAndPort
-  val rawHttpClient = Http.newService(baseUrl)
-  val client = new GenericCustomClient[IosProviderRequest, IosAuthResponse](rawHttpClient)
-  new FinatraServer(9030, new IosProvider(client), new AssetsController).main(Array())
+
+  val clientBuilder = http(baseUrl) >--< logging("http", "http") >--< objectify[IosProviderRequest, IosAuthResponse] >--< logging("IosProviderReqest->IosAutResponse", "")
+  new FinatraServer(9030, new StatusController("status.mustache", clientBuilder), new DisplayStructureController("structure.mustache", clientBuilder), new IosProvider(clientBuilder.service), new AssetsController).main(Array())
 }

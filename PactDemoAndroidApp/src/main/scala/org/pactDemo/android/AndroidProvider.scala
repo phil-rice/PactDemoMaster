@@ -5,7 +5,7 @@ import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
 import org.pactDemo.finatraUtilities._
-import org.pactDemo.mustache.{DisplayStructureController, Mustache}
+import org.pactDemo.mustache.{DisplayStructureController, Mustache, StatusController}
 import org.pactDemo.utilities._
 
 
@@ -27,5 +27,5 @@ object AndroidIOApp extends App with ServiceLanguage {
 
   val clientBuilder = http(baseUrl) >--< logging("providerHttp", "") >--< addHostName(baseUrl) >--< objectify[IdAndToken, IdTokenAndValid] >--< logging("providerIdAndToken", "")
 
-   new FinatraServer(9090, new DisplayStructureController("structure.mustache", clientBuilder), new AndroidProviderController(clientBuilder.service), new AssetsController).main(Array())
+  new FinatraServer(9090, new StatusController("status.mustache", clientBuilder), new DisplayStructureController("structure.mustache", clientBuilder), new AndroidProviderController(clientBuilder.service), new AssetsController).main(Array())
 }

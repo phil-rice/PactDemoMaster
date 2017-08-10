@@ -3,7 +3,6 @@ package org.pactDemo.finatraUtilities
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.util.Future
-import org.pactDemo.utilities.{SimpleTree, SimpleTreeRoot}
 
 import scala.reflect.ClassTag
 
@@ -23,7 +22,17 @@ object ServiceTree {
 
     def filter(acceptor: ServiceTree[_, _, Payload] => Boolean) = foldToListOfTrees.filter(acceptor)
 
-    def findAll[X](implicit classTag: ClassTag[X]) = filter(x => x.service.getClass == classTag.runtimeClass)
+    def collect[X](acceptor: PartialFunction[ServiceTree[_, _, Payload], X]) = foldToListOfTrees.collect(acceptor)
+
+    def findAll[X](implicit classTag: ClassTag[X]) = filter(x => classTag.runtimeClass.isAssignableFrom(x.service.getClass))
+
+    def findAllWithReqRes[NewReq, NewRes](implicit reqTag: ClassTag[NewReq], resTag: ClassTag[NewRes]) = filter(st => st.reqClassTag == reqTag && st.resClassTag == resTag).map(_.asInstanceOf[ServiceTree[NewReq, NewRes, Payload]])
+
+    def findAllWithServiceReqRes[NewReq, NewRes, Service <: NewReq => Future[NewRes]](implicit reqTag: ClassTag[NewReq], resTag: ClassTag[NewRes], serviceClassTag: ClassTag[Service]) =
+      filter(st => st.reqClassTag == reqTag && st.resClassTag == resTag && serviceClassTag.runtimeClass.isAssignableFrom(st.service.getClass)).map(_.asInstanceOf[ServiceTree[NewReq, NewRes, Payload]])
+
+    def allHttpServices = findAllWithReqRes[Request, Response].collect { case st: RootServiceTree[Request, Response, Payload] => st }
+
   }
 
 }
@@ -88,7 +97,6 @@ trait ServiceLanguageExtension {
 }
 
 case class ServiceDescription(description: String)
-
 
 trait HttpServiceLanguageExtension {
   def http(hostNameAndPort: String) = RootServiceTree[Request, Response, ServiceDescription](

@@ -1,0 +1,21 @@
+<html>
+<head><title>{{title}}</title></head>
+<body>
+
+<h1>Status</h1>
+<table>
+    <tr>
+        <th>Host</th>
+        <th>Url</th>
+        <th>Result</th>
+    </tr>
+    {{#status}}
+        <tr>
+            <td>{{description}}</td>
+            <td>{{url}}</td>
+            <td>{{statusCode}}{{exception}}{{exceptionMsg}}</td>
+        </tr>
+    {{/status}}
+</table>
+</body>
+</html>

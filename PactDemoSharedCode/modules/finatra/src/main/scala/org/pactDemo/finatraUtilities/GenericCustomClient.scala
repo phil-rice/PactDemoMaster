@@ -11,9 +11,7 @@ class GenericCustomClient[CustomRequest, CustomResponse](delegate: Request => Fu
                                                          fromResponse: FromResponse[CustomRequest, CustomResponse])
   extends (CustomRequest => Future[CustomResponse]) {
   override def apply(custRequest: CustomRequest): Future[CustomResponse] = {
-
     delegate(toRequest(custRequest)) map (fromResponse(custRequest, _))
-
   }
 }
 

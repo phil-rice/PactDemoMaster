@@ -3,7 +3,6 @@ package org.pactDemo.finatraUtilities
 import java.util.{logging => javalog}
 
 import com.twitter.util.Future
-import org.pactDemo.utilities.SimpleTreeOneChild
 
 import scala.reflect.ClassTag
 

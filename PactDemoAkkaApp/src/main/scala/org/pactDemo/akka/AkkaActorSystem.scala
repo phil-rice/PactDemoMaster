@@ -5,10 +5,6 @@ import java.util.{Calendar, Date}
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 
-/**
-  * Created by aban.m on 7/18/2017.
-  */
-
 trait BasicResponse
 
 case object ValidResponse extends BasicResponse

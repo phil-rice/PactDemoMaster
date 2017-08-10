@@ -91,6 +91,7 @@ class ServiceTreeTests extends PactDemoSpec with ServiceLanguageFixture {
   it should "allow services to be found" in {
     withMocks { (tree, http) =>
       tree.filter(_.service.getClass == classOf[LoggingClient[_, _]]).map(_.payload.description) shouldBe List(loggingClientName, secondLoggingClientName)
+      tree.collect { case x: DelegateTree0[_, _, ServiceDescription] if x.service.getClass == classOf[LoggingClient[_, _]] => x }.map(_.payload.description) shouldBe List(loggingClientName, secondLoggingClientName)
       tree.findAll[LoggingClient[_, _]].map(_.payload.description) shouldBe List(loggingClientName, secondLoggingClientName)
     }
   }
@@ -98,6 +99,27 @@ class ServiceTreeTests extends PactDemoSpec with ServiceLanguageFixture {
   it should "allow foldToListOfTreesAndDepth" in {
     withMocks { (tree, http) =>
       tree.foldToListOfTreesAndDepth.map { case (t, d) => (t.payload.description, d) } shouldBe List((mockHttpName, 0), (loggingClientName, 1), (addHostName, 2), (objectifyName, 3), (secondLoggingClientName, 4))
+    }
+  }
+
+  it should "allow findAll ignoring the actual types of the Req and Res" in {
+    withMocks { (tree, http) =>
+      tree.findAll[LoggingClient[_, _]].map(_.payload.description) shouldBe List(loggingClientName, secondLoggingClientName)
+      tree.findAll[LoggingClient[Request, Response]].map(_.payload.description) shouldBe List(loggingClientName, secondLoggingClientName)
+      tree.findAll[LoggingClient[String, Int]].map(_.payload.description) shouldBe List(loggingClientName, secondLoggingClientName)
+    }
+  }
+
+  it should "allow findAllWithReqRes with ReqRes" in {
+    withMocks { (tree, http) =>
+      tree.findAllWithReqRes[Request, Response].map(_.payload.description) shouldBe List(mockHttpName, loggingClientName, addHostName)
+      tree.findAllWithReqRes[MockRequest, MockResponse].map(_.payload.description) shouldBe List(objectifyName, secondLoggingClientName)
+    }
+  }
+  it should "allow findAllWithServiceReqRes " in {
+    withMocks { (tree, http) =>
+      tree.findAllWithServiceReqRes[Request, Response, LoggingClient[Request, Response]].map(_.payload.description) shouldBe List(loggingClientName)
+      tree.findAllWithServiceReqRes[MockRequest, MockResponse, LoggingClient[MockRequest, MockResponse]].map(_.payload.description) shouldBe List(secondLoggingClientName)
     }
   }
 }

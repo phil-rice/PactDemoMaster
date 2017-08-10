@@ -1,7 +1,8 @@
 package org.pactDemo.mustache
 
-import com.twitter.finagle.http.Request
+import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
+import com.twitter.util.Future
 import org.pactDemo.finatraUtilities._
 
 
@@ -19,6 +20,6 @@ object DisplayStructure extends DisplayStructure {
 }
 
 class DisplayStructureController(templateName: String, tree: ServiceTree[_, _, ServiceDescription])(implicit templateMaker: TemplateMaker, displayStructure: Templateable[ServiceTree[_, _, ServiceDescription]]) extends Controller {
-  get("/internal/structure") { request: Request => response.ok.html(templateMaker(templateName)(displayStructure(tree))) }
+   get("/internal/structure") { request: Request => response.ok.html(templateMaker(templateName)(displayStructure(tree))) }
 
 }
