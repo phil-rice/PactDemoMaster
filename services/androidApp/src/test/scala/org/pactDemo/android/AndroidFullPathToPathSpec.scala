@@ -16,7 +16,7 @@ import org.pactDemo.mustache.Mustache._
     provider.delegate = null
   }
 
-  behavior of "IosProvider"
+  behavior of "AndroidProvider"
 
   import com.itv.scalapact.ScalaPactForger._
 
