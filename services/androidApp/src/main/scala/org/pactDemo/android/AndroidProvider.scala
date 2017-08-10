@@ -24,6 +24,7 @@ object AndroidIOApp extends App with ServiceLanguage {
   import org.pactDemo.mustache.DisplayStructure._
 
   val baseUrl = Heroku.providerHostAndPort
+  println(s"Base url for provider is $baseUrl")
 
   val clientBuilder = http(baseUrl) >--< logging("providerHttp", "") >--< addHostName(baseUrl) >--< objectify[IdAndToken, IdTokenAndValid] >--< logging("providerIdAndToken", "")
 

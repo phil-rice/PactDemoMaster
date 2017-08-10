@@ -19,6 +19,6 @@ object Heroku {
     case _ => default
   }
 
-  def providerHostAndPort(implicit envStringGetter: EnvStringGetter) =  envStringGetter.getEnv("provider").getOrElse("localhost:9000")
+  def providerHostAndPort(implicit envStringGetter: EnvStringGetter) =  envStringGetter.getEnv("PROVIDER").getOrElse("localhost:9000")
 
 }

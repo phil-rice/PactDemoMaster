@@ -6,7 +6,7 @@ class HerokuSpec extends PactDemoSpec {
 
   it should "use the provider in the environment if that is set" in {
     implicit object GetEnv extends EnvStringGetter {
-      override def getEnv(name: String): Option[String] = Map("PORT" -> "333", "provider" -> "someprovider:someport").get(name)
+      override def getEnv(name: String): Option[String] = Map("PORT" -> "333", "PROVIDER" -> "someprovider:someport").get(name)
     }
 
     Heroku.port(123) shouldBe 333
