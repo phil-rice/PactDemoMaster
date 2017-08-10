@@ -1,5 +1,7 @@
 package org.pactDemo.finatraUtilities
 
+import java.util.concurrent.atomic.AtomicLong
+
 import com.twitter.util.Future
 import org.pactDemo.utilities.NanoTimeService
 
@@ -33,6 +35,16 @@ class DuractionStaleStrategy[V](maxDuration: Duration)(implicit nanoTimeService:
   }
 }
 
+class CachingMetrics {
+  val queries = new AtomicLong()
+  val cacheHits = new AtomicLong()
+  val created = new AtomicLong()
+  val passedThrough = new AtomicLong()
+  val removed = new AtomicLong()
+}
+
+case class CachingMetricsSnapshot(queries: Long, hits: Long, created: Long, passedThrough: Long, removed: Long, size: Int)
+
 class CacheData[V](initialFuture: Future[V])(implicit timeService: NanoTimeService) {
   private val lock = new Object
   private var future = initialFuture
@@ -51,32 +63,39 @@ class CacheData[V](initialFuture: Future[V])(implicit timeService: NanoTimeServi
   }
 }
 
-class CacheService[K, V](delegate: K => Future[V])(implicit checkSizeCache: CheckSizeCache, staleStrategy: StaleStrategy[V], timeService: NanoTimeService) extends (K => Future[V]) {
+class CacheService[K, V](delegate: K => Future[V], val cachingMetrics: CachingMetrics)(implicit checkSizeCache: CheckSizeCache, staleStrategy: StaleStrategy[V], timeService: NanoTimeService) extends (K => Future[V]) {
   val map = TrieMap[K, CacheData[V]]()
   private val lock = new Object
+  val metricedDelegate = { k: K => cachingMetrics.passedThrough.incrementAndGet(); delegate(k) }
+  val createdDelegate = { k: K => cachingMetrics.created.incrementAndGet(); metricedDelegate(k) }
+
+  def metrics = {
+    import cachingMetrics._
+    CachingMetricsSnapshot(queries.get(), cacheHits.get, created.get, passedThrough.get, removed.get, map.size)
+  }
 
   override def apply(k: K) = {
     removeExcessItems
-    map.getOrElseUpdate(k, new CacheData[V](delegate(k))).getReplacingIfStale(delegate(k))
+    map.getOrElseUpdate(k, new CacheData[V](createdDelegate(k))).getReplacingIfStale(metricedDelegate(k))
   }
 
   private def removeExcessItems = {
     if (checkSizeCache.needToRemove(map)) {
       lock.synchronized(if (checkSizeCache.needToRemove(map)) {
-        checkSizeCache.itemsToRemove(map).foreach(map.remove)
+        checkSizeCache.itemsToRemove(map).foreach { k => map.remove(k); cachingMetrics.removed.incrementAndGet() }
       })
     }
   }
 }
 
 trait CacheServiceLanguage extends ServiceLanguageExtension {
-  def caching[Req:ClassTag, Res:ClassTag](maxCacheSize: Int, duration: Duration = 1 minute)(implicit timeService: NanoTimeService): ServiceDelegator[Req, Res] = { childTree =>
+  def caching[Req: ClassTag, Res: ClassTag](maxCacheSize: Int = 100, duration: Duration = 1 minute, cachingMetrics: CachingMetrics = new CachingMetrics)(implicit timeService: NanoTimeService): ServiceDelegator[Req, Res] = { childTree =>
     implicit val checkSizeCache = new SimpleCheckSizeCache(maxCacheSize, Math.max(10, maxCacheSize / 4))
     implicit val staleStrategy = new DuractionStaleStrategy[Res](duration)
     DelegateTree0[Req, Res, ServiceDescription](
       childTree,
       ServiceDescription(s"CachingService($maxCacheSize)"),
-      new CacheService[Req, Res](_))
+      new CacheService[Req, Res](_, cachingMetrics))
   }
 
 }
