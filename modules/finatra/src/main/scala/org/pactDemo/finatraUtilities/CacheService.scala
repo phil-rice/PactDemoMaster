@@ -45,6 +45,7 @@ class CachingMetrics {
 
 case class CachingMetricsSnapshot(queries: Long, hits: Long, created: Long, passedThrough: Long, removed: Long, size: Int)
 
+
 class CacheData[V](initialFuture: Future[V])(implicit timeService: NanoTimeService) {
   private val lock = new Object
   private var future = initialFuture
@@ -63,7 +64,7 @@ class CacheData[V](initialFuture: Future[V])(implicit timeService: NanoTimeServi
   }
 }
 
-class CacheService[K, V](delegate: K => Future[V], cachingMetrics: CachingMetrics)(implicit checkSizeCache: CheckSizeCache, staleStrategy: StaleStrategy[V], timeService: NanoTimeService) extends (K => Future[V]) {
+class CacheService[K, V](val name: String, delegate: K => Future[V], cachingMetrics: CachingMetrics)(implicit checkSizeCache: CheckSizeCache, staleStrategy: StaleStrategy[V], timeService: NanoTimeService) extends (K => Future[V]) {
   val map = TrieMap[K, CacheData[V]]()
   private val lock = new Object
   val metricedDelegate = { k: K => cachingMetrics.passedThrough.incrementAndGet(); delegate(k) }
@@ -90,10 +91,9 @@ class CacheService[K, V](delegate: K => Future[V], cachingMetrics: CachingMetric
 }
 
 trait CacheServiceLanguage extends ServiceLanguageExtension {
-  def caching[Req: ClassTag, Res: ClassTag](maxCacheSize: Int = 100, duration: Duration = 1 minute, cachingMetrics: CachingMetrics = new CachingMetrics)(implicit timeService: NanoTimeService): ServiceDelegator[Req, Res] = { childTree =>
+  def caching[Req: ClassTag, Res: ClassTag](name: String, maxCacheSize: Int = 100, duration: Duration = 1 minute, cachingMetrics: CachingMetrics = new CachingMetrics)(implicit timeService: NanoTimeService): ServiceDelegator[Req, Res] = { childTree =>
     implicit val checkSizeCache = new SimpleCheckSizeCache(maxCacheSize, Math.max(10, maxCacheSize / 4))
     implicit val staleStrategy = new DurationStaleStrategy[Res](duration)
-    delegate(s"CachingService($maxCacheSize)", childTree, new CacheService[Req, Res](_, cachingMetrics))
+    delegate(s"CachingService($name, $maxCacheSize)", childTree, new CacheService[Req, Res](name, _, cachingMetrics))
   }
-
 }

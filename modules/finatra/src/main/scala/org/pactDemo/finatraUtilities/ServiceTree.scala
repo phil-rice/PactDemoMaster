@@ -83,6 +83,26 @@ case class TransformerTree0[OldReq, OldRes, NewReq: ClassTag, NewRes: ClassTag, 
 
 }
 
+case class TwoChildrenTree[ReqFull: ClassTag, ResFull: ClassTag, Child1Req, Child1Res, Child2Req, Child2Res, Payload](
+                                                                                                                       delegateTree1: ServiceTree[Child1Req, Child1Res, Payload],
+                                                                                                                       delegateTree2: ServiceTree[Child2Req, Child2Res, Payload],
+                                                                                                                       payload: Payload,
+                                                                                                                       serviceMaker: (Child1Req => Future[Child1Res], Child2Req => Future[Child2Res]) => ReqFull => Future[ResFull]
+                                                                                                                     ) extends ServiceTree[ReqFull, ResFull, Payload] {
+
+  /** Important constraints: Keep the same service even after map, and on multiple calls. This is the 'real' service */
+  override lazy val service = serviceMaker(delegateTree1.service, delegateTree2.service)
+
+  override def mapFromTree[NewPayload](fn: (ServiceTree[_, _, Payload]) => NewPayload) =
+    TwoChildrenTree[ReqFull, ResFull, Child1Req, Child1Res, Child2Req, Child2Res, NewPayload](delegateTree1.mapFromTree(fn), delegateTree2.mapFromTree(fn), fn(this), (_, _) => service)
+
+  override def foldFromTree[Acc](initial: Acc)(foldFn: (Acc, ServiceTree[_, _, Payload]) => Acc) = {
+    val first = delegateTree1.foldFromTree(initial)(foldFn)
+    val second = delegateTree2.foldFromTree(first)(foldFn)
+    foldFn(second, this)
+  }
+}
+
 
 trait ServiceLanguageExtension {
 
@@ -90,12 +110,16 @@ trait ServiceLanguageExtension {
     ServiceTree[OldReq, OldRes, ServiceDescription] =>
       ServiceTree[Req, Res, ServiceDescription]
   type ServiceDelegator[Req, Res] = ServiceTransformer[Req, Res, Req, Res]
+  type ServiceAggregator[ReqFull, ResFull, Child1Req, Child1Res, Child2Req, Child2Res] =
+    (ServiceTree[Child1Req, Child1Res, ServiceDescription], ServiceTree[Child2Req, Child2Res, ServiceDescription]) => ServiceTree[ReqFull, ResFull, ServiceDescription]
+
 
   //    => ServiceCreator[Req, Res, NewService, Payload])
 
   implicit class ServiceDescriptionPimper[OldReq, OldRes](sd: ServiceTree[OldReq, OldRes, ServiceDescription]) {
     def >--<[NewReq, NewRes](transformer: ServiceTransformer[OldReq, OldRes, NewReq, NewRes]): ServiceTree[NewReq, NewRes, ServiceDescription] =
       transformer(sd)
+
   }
 
   def root[Req: ClassTag, Res: ClassTag](description: String, serviceMaker: () => Req => Future[Res]) = RootServiceTree[Req, Res, ServiceDescription](ServiceDescription(description), serviceMaker)
@@ -105,6 +129,15 @@ trait ServiceLanguageExtension {
 
   def transform[OldReq: ClassTag, OldRes: ClassTag, NewReq: ClassTag, NewRes: ClassTag](description: String, delegate: ServiceTree[OldReq, OldRes, ServiceDescription], serviceMaker: (OldReq => Future[OldRes]) => NewReq => Future[NewRes]) =
     TransformerTree0(delegate, ServiceDescription(description), serviceMaker)
+
+  def twoServices[ReqFull: ClassTag, ResFull: ClassTag, Child1Req, Child1Res, Child2Req, Child2Res, Payload](
+                                                                                                              description: String,
+                                                                                                              child1: ServiceTree[Child1Req, Child1Res, ServiceDescription],
+                                                                                                              child2: ServiceTree[Child2Req, Child2Res, ServiceDescription],
+                                                                                                              serviceMaker: (Child1Req => Future[Child1Res], Child2Req => Future[Child2Res]) => ReqFull => Future[ResFull]
+                                                                                                            ) = {
+    TwoChildrenTree(child1, child2, ServiceDescription(description), serviceMaker)
+  }
 
 }
 

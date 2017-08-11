@@ -1,27 +1,56 @@
 <html>
 <head><title>{{title}}</title></head>
 <body>
+{{{.}}}
+{{#dependantServices}}
+    <h1>Status Of Dependent Microservices</h1>
 
-<h1>Status Of dependent microservices</h1>
+    <table>
+        <tr>
+            <th>Host</th>
+            <th>Url</th>
+            <th>Result</th>
+        </tr>
+        {{#status}}
+            <tr>
+                <td>{{host}}</td>
+                <td>{{url}}</td>
+                <td>{{statusCode}}{{exception}}{{exceptionMsg}}</td>
+            </tr>
+        {{/status}}
+        {{^status}}
+            <tr>
+                <td colspan="3">No Dependant Microservices</td>
+            </tr>
+        {{/status}}
+    </table>
+{{/dependantServices}}
+<h1>Status Of Caches</h1>
 <table>
     <tr>
-        <th>Host</th>
-        <th>Url</th>
-        <th>Result</th>
+        <th>name</th>
+        <th>size</th>
+        <th>queries</th>
+        <th>passedThrough</th>
+        <th>created</th>
+        <th>removed</th>
     </tr>
-    {{#status}}
-        <tr>
-            <td>{{host}}</td>
-            <td>{{url}}</td>
-            <td>{{statusCode}}{{exception}}{{exceptionMsg}}</td>
-        </tr>
-    {{/status}}
-    {{^status}}
-        <tr>
-            <td colspan="3">No Dependant Microservices</td>
-        </tr>
 
-    {{/status}}
+    {{#caches}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{size}}</td>
+            <td>{{queries}}</td>
+            <td>{{passedThrough}}</td>
+            <td>{{created}}</td>
+            <td>{{removed}}</td>
+        </tr>
+    {{/caches}}
+    {{^caches}}
+        <tr>
+            <td colspan="3"> No caches</td>
+        </tr>
+    {{/caches}}
 </table>
 </body>
 </html>

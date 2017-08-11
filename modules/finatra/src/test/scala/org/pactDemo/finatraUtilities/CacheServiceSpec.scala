@@ -20,7 +20,7 @@ class CacheServiceSpec extends PactDemoSpec {
     implicit val cacheServiceSize = new SimpleCheckSizeCache(10, 2)
     implicit val timeService = new MockNanoTimeService
     implicit val staleCacheStrategy = mock[StaleStrategy[String]]
-    fn(new CacheService(delegate, cachingMetrics), delegate, cachingMetrics, staleCacheStrategy)
+    fn(new CacheService("someName", delegate, cachingMetrics), delegate, cachingMetrics, staleCacheStrategy)
   }
 
   def checkMetrics(cacheService: CacheService[Int, String], queries: Long = 0, hits: Long = 0, created: Long = 0, passedThrough: Long = 0, removed: Long = 0, size: Int = 0) = {
