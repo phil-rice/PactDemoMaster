@@ -9,6 +9,7 @@ import org.pactDemo.finatraUtilities._
 trait DisplayStructure extends Templateable[ServiceTree[_, _, ServiceDescription]] {
 
   override def apply(tree: ServiceTree[_, _, ServiceDescription]): TemplateItem = {
+
     TemplateItem(Map("structure" -> tree.foldToListOfTreesAndDepth.map { case (tree, depth) => Map("depth" -> depth, "indent" -> List.fill(depth)("&nbsp;").mkString, "description" -> tree.payload.description) }))
   }
 

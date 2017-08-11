@@ -46,7 +46,7 @@ trait ServiceLanguageFixture extends MockitoSugar {
 
 }
 
-class ServiceTreeTests extends PactDemoSpec with ServiceLanguageFixture {
+class ServiceTreeSpec extends PactDemoSpec with ServiceLanguageFixture {
 
   import org.mockito.Mockito._
   import Futures._
@@ -98,7 +98,7 @@ class ServiceTreeTests extends PactDemoSpec with ServiceLanguageFixture {
 
   it should "allow foldToListOfTreesAndDepth" in {
     withMocks { (tree, http) =>
-      tree.foldToListOfTreesAndDepth.map { case (t, d) => (t.payload.description, d) } shouldBe List((mockHttpName, 0), (loggingClientName, 1), (addHostName, 2), (objectifyName, 3), (secondLoggingClientName, 4))
+      tree.foldToListOfTreesAndDepth.map { case (t, d) => (t.payload.description, d) } shouldBe List((mockHttpName, 4), (loggingClientName, 3), (addHostName, 2), (objectifyName, 1), (secondLoggingClientName, 0))
     }
   }
 
