@@ -63,7 +63,7 @@ class CacheData[V](initialFuture: Future[V])(implicit timeService: NanoTimeServi
   }
 }
 
-class CacheService[K, V](delegate: K => Future[V],  cachingMetrics: CachingMetrics)(implicit checkSizeCache: CheckSizeCache, staleStrategy: StaleStrategy[V], timeService: NanoTimeService) extends (K => Future[V]) {
+class CacheService[K, V](delegate: K => Future[V], cachingMetrics: CachingMetrics)(implicit checkSizeCache: CheckSizeCache, staleStrategy: StaleStrategy[V], timeService: NanoTimeService) extends (K => Future[V]) {
   val map = TrieMap[K, CacheData[V]]()
   private val lock = new Object
   val metricedDelegate = { k: K => cachingMetrics.passedThrough.incrementAndGet(); delegate(k) }
@@ -93,10 +93,7 @@ trait CacheServiceLanguage extends ServiceLanguageExtension {
   def caching[Req: ClassTag, Res: ClassTag](maxCacheSize: Int = 100, duration: Duration = 1 minute, cachingMetrics: CachingMetrics = new CachingMetrics)(implicit timeService: NanoTimeService): ServiceDelegator[Req, Res] = { childTree =>
     implicit val checkSizeCache = new SimpleCheckSizeCache(maxCacheSize, Math.max(10, maxCacheSize / 4))
     implicit val staleStrategy = new DurationStaleStrategy[Res](duration)
-    DelegateTree0[Req, Res, ServiceDescription](
-      childTree,
-      ServiceDescription(s"CachingService($maxCacheSize)"),
-      new CacheService[Req, Res](_, cachingMetrics))
+    delegate(s"CachingService($maxCacheSize)", childTree, new CacheService[Req, Res](_, cachingMetrics))
   }
 
 }

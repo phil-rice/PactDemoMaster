@@ -2,7 +2,7 @@
 <head><title>{{title}}</title></head>
 <body>
 
-<h1>Status</h1>
+<h1>Status Of dependent microservices</h1>
 <table>
     <tr>
         <th>Host</th>
@@ -15,6 +15,12 @@
             <td>{{url}}</td>
             <td>{{statusCode}}{{exception}}{{exceptionMsg}}</td>
         </tr>
+    {{/status}}
+    {{^status}}
+        <tr>
+            <td colspan="3">No Dependant Microservices</td>
+        </tr>
+
     {{/status}}
 </table>
 </body>

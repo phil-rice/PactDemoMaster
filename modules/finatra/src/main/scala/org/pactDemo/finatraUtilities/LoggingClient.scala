@@ -19,12 +19,7 @@ class LoggingClient[Req, Res](name: String, prefix: String, delegate: Req => Fut
 
 trait LoggingClientServiceLanguageExtension extends ServiceLanguageExtension {
 
-  def logging[Req:ClassTag, Res:ClassTag, OldService <: Req => Future[Res]](name: String, prefix: String)(implicit reqLog: LogData[Req], resLog: LogData[Res], log: LogMe):
-  ServiceDelegator[Req, Res] = { childTree =>
-    DelegateTree0[Req, Res, ServiceDescription](
-      childTree, ServiceDescription(
-        s"LoggingClient($name,$prefix)"),
-      new LoggingClient[Req, Res](name, prefix, _)
-    )
+  def logging[Req: ClassTag, Res: ClassTag, OldService <: Req => Future[Res]](name: String, prefix: String)(implicit reqLog: LogData[Req], resLog: LogData[Res], log: LogMe): ServiceDelegator[Req, Res] =
+  { childTree => delegate(s"LoggingClient($name,$prefix)", childTree, new LoggingClient[Req, Res](name, prefix, _))
   }
 }

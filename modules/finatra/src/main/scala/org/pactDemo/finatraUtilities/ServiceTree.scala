@@ -98,18 +98,23 @@ trait ServiceLanguageExtension {
       transformer(sd)
   }
 
+  def root[Req: ClassTag, Res: ClassTag](description: String, serviceMaker: () => Req => Future[Res]) = RootServiceTree[Req, Res, ServiceDescription](ServiceDescription(description), serviceMaker)
+
+  def delegate[Req: ClassTag, Res: ClassTag](description: String, delegate: ServiceTree[Req, Res, ServiceDescription], serviceMaker: (Req => Future[Res]) => Req => Future[Res]) =
+    DelegateTree0(delegate, ServiceDescription(description), serviceMaker)
+
+  def transform[OldReq: ClassTag, OldRes: ClassTag, NewReq: ClassTag, NewRes: ClassTag](description: String, delegate: ServiceTree[OldReq, OldRes, ServiceDescription], serviceMaker: (OldReq => Future[OldRes]) => NewReq => Future[NewRes]) =
+    TransformerTree0(delegate, ServiceDescription(description), serviceMaker)
+
 }
 
 case class ServiceDescription(description: String)
 
-trait HttpServiceLanguageExtension {
-  def http(hostNameAndPort: String) = RootServiceTree[Request, Response, ServiceDescription](
-    ServiceDescription(s"FinagleHttp($hostNameAndPort)"), () => Http.newService(hostNameAndPort)
-  )
 
-  //  RootServiceCreator[Request, Response, Request => Future[Response]](s"FinagleHttp($hostNameAndPort)", () => Http.newService(hostNameAndPort))
+trait HttpServiceLanguageExtension extends ServiceLanguageExtension {
+  def http(hostNameAndPort: String) = root(s"FinagleHttp($hostNameAndPort)", () => Http.newService(hostNameAndPort))
 }
 
-trait ServiceLanguage extends HttpServiceLanguageExtension with GenericCustomClientLanguageExtension with AddHostNameServiceLanguageExtension with LoggingClientServiceLanguageExtension with CacheServiceLanguage
+trait ServiceLanguage extends HttpServiceLanguageExtension with GenericCustomClientLanguageExtension with AddHostNameServiceLanguageExtension with LoggingClientServiceLanguageExtension with CacheServiceLanguage with RecoverFromErrorServiceLanguage
 
 object ServiceLanguage extends ServiceLanguage

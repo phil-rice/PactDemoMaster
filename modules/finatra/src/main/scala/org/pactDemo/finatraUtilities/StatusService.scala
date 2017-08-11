@@ -33,12 +33,12 @@ object StatusResponse {
 }
 
 class StatusService(detailedStatusRequest: DetailedStatusRequest, delegate: Request => Future[Response]) extends (StatusRequest => Future[StatusResponse]) {
-  val objectify = new GenericCustomClient[DetailedStatusRequest, StatusResponse](delegate)
-  val recoverFromErrorService = RecoverFromErrorService[DetailedStatusRequest, StatusResponse](objectify) {
-    case (req, Throw(e)) => Return(ExceptionStatusResponse(req, e))
-  }
 
-  override def apply(sr: StatusRequest) = recoverFromErrorService(detailedStatusRequest)
+  import ServiceLanguage._
+
+  val client = root[Request, Response](s"Status Http$detailedStatusRequest", () => delegate) >--< objectify[DetailedStatusRequest, StatusResponse] >--< recoverFromError { case (req, Throw(e)) => Return(ExceptionStatusResponse(req, e)) }
+
+  override def apply(sr: StatusRequest) = client.service(detailedStatusRequest)
 }
 
 case class StatusReport(details: Seq[StatusResponse])

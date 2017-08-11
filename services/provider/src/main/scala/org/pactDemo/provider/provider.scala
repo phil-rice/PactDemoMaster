@@ -73,10 +73,7 @@ class AuthenticationService extends (AuthenticationRequest => Future[Authenticat
 }
 
 trait AuthenticationLanguage extends ServiceLanguageExtension {
-  def authenticate =
-    RootServiceTree[AuthenticationRequest, AuthenticationResult, ServiceDescription](
-      ServiceDescription(s"AuthenticationService"),
-      () => new AuthenticationService)
+  def authenticate = root(s"AuthenticationService", () => new AuthenticationService)
 }
 
 trait FromRequest[T] extends (Request => T)
@@ -104,6 +101,7 @@ class ProviderController(authenticationService: AuthenticationRequest => Future[
 object Provider extends App with ServiceLanguage with AuthenticationLanguage {
   implicit val loggerAdapter = FinagleLoggingAdapter
   implicit val logme = new SimpleLogMe
+
   import Mustache._
   import org.pactDemo.mustache.DisplayStructure._
 
