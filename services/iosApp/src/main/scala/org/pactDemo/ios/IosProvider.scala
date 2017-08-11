@@ -95,8 +95,9 @@ object IosProvider extends App with ServiceLanguage {
 
   import Mustache._
   import org.pactDemo.mustache.DisplayStructure._
+
   val baseUrl = Heroku.providerHostAndPort
 
   val clientBuilder = http(baseUrl) >--< logging("http", "http") >--< objectify[IosProviderRequest, IosAuthResponse] >--< logging("IosProviderReqest->IosAutResponse", "")
-  new FinatraServer(9030, new StatusController("status.mustache", clientBuilder), new DisplayStructureController("structure.mustache", clientBuilder), new IosProvider(clientBuilder.service), new AssetsController).main(Array())
+  new FinatraServer(9030, new StatusController(clientBuilder), new DisplayStructureController(clientBuilder), new IosProvider(clientBuilder.service), new AssetsController).main(Array())
 }

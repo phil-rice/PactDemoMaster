@@ -20,7 +20,7 @@ object DisplayStructure extends DisplayStructure {
   implicit val defaultDisplayStructure = this
 }
 
-class DisplayStructureController(templateName: String, tree: ServiceTree[_, _, ServiceDescription])(implicit templateMaker: TemplateMaker, displayStructure: Templateable[ServiceTree[_, _, ServiceDescription]]) extends Controller {
+class DisplayStructureController(tree: ServiceTree[_, _, ServiceDescription], templateName: String = "structure.mustache")(implicit templateMaker: TemplateMaker, displayStructure: Templateable[ServiceTree[_, _, ServiceDescription]]) extends Controller {
    get("/internal/structure") { request: Request => response.ok.html(templateMaker(templateName)(displayStructure(tree))) }
 
 }

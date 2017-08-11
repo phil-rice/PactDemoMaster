@@ -156,7 +156,7 @@ lazy val androidApp = (project in file("services/androidApp")).
   settings(logbackSettings: _*).
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
-lazy val actorApp= (project in file("services/actorApp")).
+lazy val actorApp = (project in file("services/actorApp")).
   dependsOn(utilities % "test->test;compile->compile", finatra).
   aggregate(utilities, finatra).
   settings(pactConsumerSettings: _*).
@@ -172,8 +172,8 @@ lazy val angularIOApp = (project in file("services/angularIOApp")).dependsOn(uti
   settings(pactConsumerSettings: _*).enablePlugins(JavaAppPackaging)
 
 lazy val provider = (project in file("services/provider")).
-  dependsOn(utilities % "test->test;compile->compile", finatra % "test->test;compile->compile").
-  aggregate(utilities, finatra).
+  dependsOn(utilities % "test->test;compile->compile", finatra % "test->test;compile->compile", mustache).
+  aggregate(utilities, finatra, mustache).
   settings(finatraSettings: _*).
   settings(pactConsumerSettings: _*).
   enablePlugins(JavaAppPackaging)

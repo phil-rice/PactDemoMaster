@@ -2,11 +2,12 @@ package org.pactDemo.provider
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala._
+import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
 import org.pactDemo.finatraUtilities._
-
+import org.pactDemo.mustache.{DisplayStructureController, Mustache, StatusController}
 
 
 case class AuthenticationRequestWithPrefixBody(`Authentication-token`: String) {
@@ -71,6 +72,13 @@ class AuthenticationService extends (AuthenticationRequest => Future[Authenticat
   }
 }
 
+trait AuthenticationLanguage extends ServiceLanguageExtension {
+  def authenticate =
+    RootServiceTree[AuthenticationRequest, AuthenticationResult, ServiceDescription](
+      ServiceDescription(s"AuthenticationService"),
+      () => new AuthenticationService)
+}
+
 trait FromRequest[T] extends (Request => T)
 
 trait MakeResponse[T] extends (T => Response)
@@ -93,9 +101,12 @@ class ProviderController(authenticationService: AuthenticationRequest => Future[
 }
 
 
-object Provider extends App {
+object Provider extends App with ServiceLanguage with AuthenticationLanguage {
   implicit val loggerAdapter = FinagleLoggingAdapter
   implicit val logme = new SimpleLogMe
-
-  new FinatraServer(9000, new ProviderController(new LoggingClient[AuthenticationRequest, AuthenticationResult]("AuthenticationService", "", new AuthenticationService)), new AssetsController).main(Array())
+  import Mustache._
+  import org.pactDemo.mustache.DisplayStructure._
+  
+  val clientBuilder = authenticate >--< logging("AuthenticationService", "")
+  new FinatraServer(9000, new StatusController(clientBuilder), new DisplayStructureController(clientBuilder), new ProviderController(clientBuilder.service), new AssetsController).main(Array())
 }
