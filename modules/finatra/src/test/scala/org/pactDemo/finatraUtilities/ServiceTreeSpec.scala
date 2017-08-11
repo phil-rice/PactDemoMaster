@@ -98,7 +98,7 @@ class ServiceTreeSpec extends PactDemoSpec with ServiceLanguageFixture {
 
   it should "allow foldToListOfTreesAndDepth" in {
     withMocks { (tree, http) =>
-      tree.foldToListOfTreesAndDepth.map { case (t, d) => (t.payload.description, d) } shouldBe List((mockHttpName, 4), (loggingClientName, 3), (addHostName, 2), (objectifyName, 1), (secondLoggingClientName, 0))
+      tree.foldToListOfTreesAndDepth.map { case (t, d) => (t.payload.description, d) } shouldBe List((secondLoggingClientName, 0), (objectifyName, 1), (addHostName, 2), (loggingClientName, 3), (mockHttpName, 4))
     }
   }
 

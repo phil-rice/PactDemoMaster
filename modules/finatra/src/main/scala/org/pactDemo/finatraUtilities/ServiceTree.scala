@@ -19,7 +19,7 @@ object ServiceTree {
     type IndentTreeAcc = (List[(ServiceTree[_, _, Payload], Int)], Int)
 
     def foldToListOfTreesAndDepth: List[(ServiceTree[_, _, Payload], Int)] = {
-      val resultWithWrongDepths = tree.foldFromTree[IndentTreeAcc]((List(), 0)) { case ((list, depth), tree) => (list :+ (tree, depth), depth + 1) }._1
+      val resultWithWrongDepths = tree.foldFromTree[IndentTreeAcc]((List(), 0)) { case ((list, depth), tree) => ((tree, depth) :: list, depth + 1) }._1
       val maxDepth = resultWithWrongDepths.map(_._2).max
       resultWithWrongDepths.map { case (tree, depth) => (tree, maxDepth - depth) }
     }
