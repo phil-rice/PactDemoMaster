@@ -8,7 +8,7 @@ trait StatusRequest
 object StatusRequest extends StatusRequest
 
 
-case class DetailedStatusRequest(description: String, url: String)
+case class DetailedStatusRequest(description: String, host: String, url: String)
 
 object DetailedStatusRequest {
 
@@ -33,7 +33,6 @@ object StatusResponse {
 }
 
 class StatusService(detailedStatusRequest: DetailedStatusRequest, delegate: Request => Future[Response]) extends (StatusRequest => Future[StatusResponse]) {
-
   val objectify = new GenericCustomClient[DetailedStatusRequest, StatusResponse](delegate)
   val recoverFromErrorService = RecoverFromErrorService[DetailedStatusRequest, StatusResponse](objectify) {
     case (req, Throw(e)) => Return(ExceptionStatusResponse(req, e))
@@ -49,8 +48,8 @@ object StatusReport {
   implicit object TemplateableForStatusReport extends Templateable[StatusReport] {
     override def apply(v1: StatusReport): TemplateItem = TemplateItem(
       Map("status" -> v1.details.map {
-        case sr: GoodStatusResponse => Map("description" -> sr.statusRequest.description, "url" -> sr.statusRequest.url, "statusCode" -> sr.statusCode)
-        case sr: ExceptionStatusResponse => Map("description" -> sr.statusRequest.description, "url" -> sr.statusRequest.url, "exception" -> sr.exception.getClass.getName, "exceptionMsg" -> sr.exception.getMessage)
+        case sr: GoodStatusResponse => Map("host" -> sr.statusRequest.host, "url" -> sr.statusRequest.url, "statusCode" -> sr.statusCode)
+        case sr: ExceptionStatusResponse => Map("host" -> sr.statusRequest.host, "url" -> sr.statusRequest.url, "exception" -> sr.exception.getClass.getName, "exceptionMsg" -> sr.exception.getMessage)
       })
     )
   }
@@ -58,7 +57,9 @@ object StatusReport {
 }
 
 class FullStatusService(tree: ServiceTree[_, _, ServiceDescription]) extends (StatusRequest => Future[StatusReport]) {
-  val statusServices: Seq[StatusService] = tree.allHttpServices.map(st => new StatusService(DetailedStatusRequest(st.payload.description, "/status"), st.service))
+  val addHostNameServices = tree.findAllTreesWithServiceReqRes[Request, Response, AddHostNameService]
+
+  val statusServices: Seq[StatusService] = addHostNameServices.map(st => new StatusService(DetailedStatusRequest(st.payload.description, st.service.asInstanceOf[AddHostNameService].hostName, "status"), st.service))
 
   override def apply(v1: StatusRequest) = Future.collect(statusServices.map(_ apply v1)).map(StatusReport.apply)
 

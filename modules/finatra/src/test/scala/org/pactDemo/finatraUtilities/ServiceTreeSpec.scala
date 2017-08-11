@@ -118,8 +118,8 @@ class ServiceTreeSpec extends PactDemoSpec with ServiceLanguageFixture {
   }
   it should "allow findAllWithServiceReqRes " in {
     withMocks { (tree, http) =>
-      tree.findAllWithServiceReqRes[Request, Response, LoggingClient[Request, Response]].map(_.payload.description) shouldBe List(loggingClientName)
-      tree.findAllWithServiceReqRes[MockRequest, MockResponse, LoggingClient[MockRequest, MockResponse]].map(_.payload.description) shouldBe List(secondLoggingClientName)
+      tree.findAllTreesWithServiceReqRes[Request, Response, LoggingClient[Request, Response]].map(_.payload.description) shouldBe List(loggingClientName)
+      tree.findAllTreesWithServiceReqRes[MockRequest, MockResponse, LoggingClient[MockRequest, MockResponse]].map(_.payload.description) shouldBe List(secondLoggingClientName)
     }
   }
 }

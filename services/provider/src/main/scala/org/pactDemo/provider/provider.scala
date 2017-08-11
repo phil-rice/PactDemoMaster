@@ -106,7 +106,7 @@ object Provider extends App with ServiceLanguage with AuthenticationLanguage {
   implicit val logme = new SimpleLogMe
   import Mustache._
   import org.pactDemo.mustache.DisplayStructure._
-  
+
   val clientBuilder = authenticate >--< logging("AuthenticationService", "")
   new FinatraServer(9000, new StatusController(clientBuilder), new DisplayStructureController(clientBuilder), new ProviderController(clientBuilder.service), new AssetsController).main(Array())
 }

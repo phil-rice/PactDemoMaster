@@ -26,7 +26,7 @@ trait StaleStrategy[V] {
   def apply(v: CacheData[V]): Boolean
 }
 
-class DuractionStaleStrategy[V](maxDuration: Duration)(implicit nanoTimeService: NanoTimeService) extends StaleStrategy[V] {
+class DurationStaleStrategy[V](maxDuration: Duration)(implicit nanoTimeService: NanoTimeService) extends StaleStrategy[V] {
   val durationInNanos = maxDuration.toNanos
 
   override def apply(v: CacheData[V]) = {
@@ -63,7 +63,7 @@ class CacheData[V](initialFuture: Future[V])(implicit timeService: NanoTimeServi
   }
 }
 
-class CacheService[K, V](delegate: K => Future[V], val cachingMetrics: CachingMetrics)(implicit checkSizeCache: CheckSizeCache, staleStrategy: StaleStrategy[V], timeService: NanoTimeService) extends (K => Future[V]) {
+class CacheService[K, V](delegate: K => Future[V],  cachingMetrics: CachingMetrics)(implicit checkSizeCache: CheckSizeCache, staleStrategy: StaleStrategy[V], timeService: NanoTimeService) extends (K => Future[V]) {
   val map = TrieMap[K, CacheData[V]]()
   private val lock = new Object
   val metricedDelegate = { k: K => cachingMetrics.passedThrough.incrementAndGet(); delegate(k) }
@@ -76,6 +76,7 @@ class CacheService[K, V](delegate: K => Future[V], val cachingMetrics: CachingMe
 
   override def apply(k: K) = {
     removeExcessItems
+    cachingMetrics.queries.incrementAndGet()
     map.getOrElseUpdate(k, new CacheData[V](createdDelegate(k))).getReplacingIfStale(metricedDelegate(k))
   }
 
@@ -91,7 +92,7 @@ class CacheService[K, V](delegate: K => Future[V], val cachingMetrics: CachingMe
 trait CacheServiceLanguage extends ServiceLanguageExtension {
   def caching[Req: ClassTag, Res: ClassTag](maxCacheSize: Int = 100, duration: Duration = 1 minute, cachingMetrics: CachingMetrics = new CachingMetrics)(implicit timeService: NanoTimeService): ServiceDelegator[Req, Res] = { childTree =>
     implicit val checkSizeCache = new SimpleCheckSizeCache(maxCacheSize, Math.max(10, maxCacheSize / 4))
-    implicit val staleStrategy = new DuractionStaleStrategy[Res](duration)
+    implicit val staleStrategy = new DurationStaleStrategy[Res](duration)
     DelegateTree0[Req, Res, ServiceDescription](
       childTree,
       ServiceDescription(s"CachingService($maxCacheSize)"),

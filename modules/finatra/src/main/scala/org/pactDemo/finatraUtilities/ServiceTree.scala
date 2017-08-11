@@ -32,7 +32,7 @@ object ServiceTree {
 
     def findAllWithReqRes[NewReq, NewRes](implicit reqTag: ClassTag[NewReq], resTag: ClassTag[NewRes]) = filter(st => st.reqClassTag == reqTag && st.resClassTag == resTag).map(_.asInstanceOf[ServiceTree[NewReq, NewRes, Payload]])
 
-    def findAllWithServiceReqRes[NewReq, NewRes, Service <: NewReq => Future[NewRes]](implicit reqTag: ClassTag[NewReq], resTag: ClassTag[NewRes], serviceClassTag: ClassTag[Service]) =
+    def findAllTreesWithServiceReqRes[NewReq, NewRes, Service <: NewReq => Future[NewRes]](implicit reqTag: ClassTag[NewReq], resTag: ClassTag[NewRes], serviceClassTag: ClassTag[Service]) =
       filter(st => st.reqClassTag == reqTag && st.resClassTag == resTag && serviceClassTag.runtimeClass.isAssignableFrom(st.service.getClass)).map(_.asInstanceOf[ServiceTree[NewReq, NewRes, Payload]])
 
     def allHttpServices = findAllWithReqRes[Request, Response].collect { case st: RootServiceTree[Request, Response, Payload] => st }
