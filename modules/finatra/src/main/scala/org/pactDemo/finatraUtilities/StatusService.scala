@@ -59,7 +59,7 @@ object DependantServicesStatusReport {
 class DependantServicesStatusService(tree: ServiceTree[_, _, ServiceDescription]) extends (DependantServiceStatusRequest => Future[DependantServicesStatusReport]) {
   val addHostNameServices = tree.findAllTreesWithServiceReqRes[Request, Response, AddHostNameService]
 
-  val statusServices: Seq[StatusService] = addHostNameServices.map(st => new StatusService(DetailedStatusRequest(st.payload.description, st.service.asInstanceOf[AddHostNameService].hostName, "status"), st.service))
+  val statusServices: Seq[StatusService] = addHostNameServices.map(st => new StatusService(DetailedStatusRequest(st.payload.description, st.service.asInstanceOf[AddHostNameService].hostName, "/status"), st.service))
 
   override def apply(v1: DependantServiceStatusRequest) = Future.collect(statusServices.map(_ apply v1)).map(DependantServicesStatusReport.apply)
 
