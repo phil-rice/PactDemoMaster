@@ -85,6 +85,7 @@ object NameAndCachingMetrics {
         "created" -> created,
         "passedThrough" -> passedThrough,
         "removed" -> removed,
+        "cleared" -> cleared,
         "size" -> size))
     }
   }

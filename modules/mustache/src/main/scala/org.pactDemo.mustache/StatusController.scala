@@ -9,5 +9,5 @@ class StatusController(tree: ServiceTree[_, _, ServiceDescription], templateName
 
   def toHtmlResponse(html: String) = response.ok().html(html)
 
-  get("/status") { request: Request => FullStatusRequest ~> fullStatusService ~> displayStatus ~> templateMaker(templateName) ~> toHtmlResponse }
+  any("/status") { request: Request => FullStatusRequest ~> fullStatusService ~> displayStatus ~> templateMaker(templateName) ~> toHtmlResponse }
 }

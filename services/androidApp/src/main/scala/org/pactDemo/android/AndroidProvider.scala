@@ -29,5 +29,5 @@ object AndroidIOApp extends App with ServiceLanguage {
 
   val clientBuilder = http(baseUrl) >--< logging("providerHttp", "") >--< addHostName(baseUrl) >--< objectify[IdAndToken, IdTokenAndValid] >--< logging("providerIdAndToken", "") >--< caching("Provider")
 
-  new FinatraServer(9090, new StatusController(clientBuilder), new DisplayStructureController(clientBuilder), new AndroidProviderController(clientBuilder.service), new AssetsController).main(Array())
+  new FinatraServer(9090, new StatusController(clientBuilder), new ClearCacheController(clientBuilder), new DisplayStructureController(clientBuilder), new AndroidProviderController(clientBuilder.service), new AssetsController).main(Array())
 }

@@ -41,9 +41,10 @@ class CachingMetrics {
   val created = new AtomicLong()
   val passedThrough = new AtomicLong()
   val removed = new AtomicLong()
+  val cleared = new AtomicLong()
 }
 
-case class CachingMetricsSnapshot(queries: Long, hits: Long, created: Long, passedThrough: Long, removed: Long, size: Int)
+case class CachingMetricsSnapshot(queries: Long, hits: Long, created: Long, passedThrough: Long, removed: Long, cleared: Long, size: Int)
 
 
 class CacheData[V](initialFuture: Future[V])(implicit timeService: NanoTimeService) {
@@ -72,9 +73,13 @@ class CacheService[K, V](val name: String, delegate: K => Future[V], cachingMetr
 
   def metrics = {
     import cachingMetrics._
-    CachingMetricsSnapshot(queries.get(), cacheHits.get, created.get, passedThrough.get, removed.get, map.size)
+    CachingMetricsSnapshot(queries.get(), cacheHits.get, created.get, passedThrough.get, removed.get, cleared.get, map.size)
   }
 
+  def clear = {
+    cachingMetrics.cleared.incrementAndGet()
+    lock.synchronized(map.clear())
+  }
   override def apply(k: K) = {
     removeExcessItems
     cachingMetrics.queries.incrementAndGet()

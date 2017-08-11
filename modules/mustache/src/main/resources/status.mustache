@@ -28,12 +28,13 @@
 <h1>Status Of Caches</h1>
 <table>
     <tr>
-        <th>name</th>
-        <th>size</th>
-        <th>queries</th>
-        <th>passedThrough</th>
-        <th>created</th>
-        <th>removed</th>
+        <th>Name</th>
+        <th>Size</th>
+        <th>Queries</th>
+        <th>PassedThrough</th>
+        <th>Created</th>
+        <th>Removed</th>
+        <th>Cleared</th>
     </tr>
 
     {{#caches}}
@@ -44,6 +45,7 @@
             <td>{{passedThrough}}</td>
             <td>{{created}}</td>
             <td>{{removed}}</td>
+            <td>{{cleared}}</td>
         </tr>
     {{/caches}}
     {{^caches}}
@@ -52,5 +54,8 @@
         </tr>
     {{/caches}}
 </table>
+<form method="post" action="/internal/cache/clear">
+    <button type="submit">Clear Caches</button>
+</form>
 </body>
 </html>
