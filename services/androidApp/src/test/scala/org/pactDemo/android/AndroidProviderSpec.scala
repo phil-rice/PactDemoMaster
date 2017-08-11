@@ -1,12 +1,11 @@
 package org.pactDemo.android
 
 import com.twitter.finagle.http.Status
-import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.util.Future
 import org.mockito.Mockito._
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer, NullSl4jLoggingAdapter}
-import org.pactDemo.utilities.PactDemoSpec
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FeatureSpec}
+import org.pactDemo.finatra.FinatraControllerSpec
+import org.pactDemo.finatra.utilities.NullSl4jLoggingAdapter
+import org.scalatest.BeforeAndAfter
 
 class AndroidProviderSpec extends FinatraControllerSpec with BeforeAndAfter {
   implicit val loggingAdapter = NullSl4jLoggingAdapter

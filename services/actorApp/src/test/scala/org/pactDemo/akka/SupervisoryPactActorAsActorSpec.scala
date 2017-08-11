@@ -6,16 +6,14 @@ import akka.testkit.{ImplicitSender, TestKit}
 import akka.util.Timeout
 import com.twitter.util.Future
 import org.mockito.Mockito._
-import org.pactDemo.finatraUtilities.{GenericCustomClient, Json, PactArrow}
+import org.pactDemo.finatra.service.GenericCustomClient
+import org.pactDemo.finatra.utilities.Json
 import org.pactDemo.utilities.PactDemoSpec2
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Matchers, WordSpecLike}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.language.postfixOps
-import org.pactDemo.finatraUtilities.Futures._
-import scala.language.postfixOps
-import scala.language.reflectiveCalls
+import scala.language.{postfixOps, reflectiveCalls}
 
 class SupervisoryPactActorAsActorSpec extends TestKit(ActorSystem("SupervisoryPactActorSpec3"))
   with ImplicitSender

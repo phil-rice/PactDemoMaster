@@ -6,7 +6,7 @@ import akka.testkit.{ImplicitSender, TestKit}
 import akka.util.Timeout
 import com.twitter.util.Future
 import org.mockito.Mockito._
-import org.pactDemo.finatraUtilities.GenericCustomClient
+import org.pactDemo.finatra.service.GenericCustomClient
 import org.pactDemo.utilities.PactDemoSpec2
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Matchers, WordSpecLike}
 

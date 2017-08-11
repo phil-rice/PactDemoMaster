@@ -3,9 +3,6 @@ package org.pactDemo.javaConsumer;
 import au.com.dius.pact.consumer.*;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.model.RequestResponsePact;
-
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Assert;
 import org.junit.Rule;
 

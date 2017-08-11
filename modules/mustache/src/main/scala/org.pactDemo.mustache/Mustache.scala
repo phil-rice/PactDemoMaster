@@ -4,7 +4,7 @@ import java.io.StringWriter
 
 import com.github.mustachejava.{DefaultMustacheFactory, Mustache => JMustache}
 import com.twitter.mustache.ScalaObjectHandler
-import org.pactDemo.finatraUtilities.{TemplateItem, TemplateMaker}
+import org.pactDemo.utilities.{TemplateItem, TemplateMaker}
 
 trait Mustache extends TemplateMaker {
   val mf = new DefaultMustacheFactory()

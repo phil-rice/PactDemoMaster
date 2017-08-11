@@ -1,6 +1,6 @@
 package com.pactDemo
 
-import org.pactDemo.finatraUtilities.FinagleLoggingAdapter
+import org.pactDemo.finatra.utilities.FinagleLoggingAdapter
 import org.pactDemo.utilities.PactDemoSpec
 import org.scalatest.BeforeAndAfter
 

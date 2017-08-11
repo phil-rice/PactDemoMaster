@@ -2,14 +2,11 @@ package org.pactDemo.akka
 
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.twitter.finagle.http.Response
-import org.pactDemo.akka.CustomReplyObject.makeCustomResponse
 import org.pactDemo.akka.CustomRequestObject.ToRequestForCustomRequestObject
-import org.pactDemo.finatraUtilities.Json
+import org.pactDemo.finatra.utilities.Json
 import org.pactDemo.utilities.PactDemoSpec
 
 class SupervisoryPactActorSpec extends PactDemoSpec {
-
-  import org.mockito.Mockito._
 
   val someResponse = mock[Response]
 

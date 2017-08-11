@@ -1,9 +1,7 @@
 package org.pactDemo.provider
 
 import com.itv.scalapact.ScalaPactVerify._
-import com.twitter.finatra.http.EmbeddedHttpServer
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer}
-import org.scalatest.{BeforeAndAfterAll, FlatSpec}
+import org.pactDemo.finatra.FinatraControllerSpec
 
 class ProviderPactVerifierSpec extends FinatraControllerSpec {
 

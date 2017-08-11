@@ -1,7 +1,6 @@
 package org.pactDemo.mustache
 
-import org.pactDemo.finatraUtilities.TemplateItem
-import org.pactDemo.utilities.PactDemoSpec
+import org.pactDemo.utilities.{PactDemoSpec, TemplateItem}
 
 
 class MustacheSpec extends PactDemoSpec{

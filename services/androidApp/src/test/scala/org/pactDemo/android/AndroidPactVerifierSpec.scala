@@ -3,7 +3,8 @@ package org.pactDemo.android
 
 import com.itv.scalapact.ScalaPactVerify._
 import com.twitter.util.Future
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, NullSl4jLoggingAdapter}
+import org.pactDemo.finatra.FinatraControllerSpec
+import org.pactDemo.finatra.utilities.NullSl4jLoggingAdapter
 
 class AndroidPactVerifierSpec extends FinatraControllerSpec {
   implicit val loggingAdapter = NullSl4jLoggingAdapter

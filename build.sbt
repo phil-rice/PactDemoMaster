@@ -180,8 +180,8 @@ lazy val provider = (project in file("services/provider")).
 
 
 lazy val mustache = (project in file("modules/mustache")).
-  dependsOn(utilities % "test->test;compile->compile", finatra).
-  aggregate(utilities, finatra).
+  dependsOn(utilities % "test->test;compile->compile").
+  aggregate(utilities).
   settings(commonSettings: _*).
   settings(mustacheSettings: _*)
 

@@ -2,8 +2,9 @@ package org.pactDemo.android
 
 import com.twitter.finagle.http.{Method, Request, Response}
 import com.twitter.finatra.http.response.ResponseBuilder
-import org.pactDemo.finatraUtilities._
+import org.pactDemo.finatra.utilities._
 import org.pactDemo.utilities._
+
 import scala.language.implicitConversions
 
 case class IdAndToken(id: Int, token: String)

@@ -1,8 +1,5 @@
 package org.pactDemo.akka
 
-import java.text.SimpleDateFormat
-import java.util.{Calendar, Date}
-
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 
 trait BasicResponse

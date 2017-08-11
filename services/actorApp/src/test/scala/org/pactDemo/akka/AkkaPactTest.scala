@@ -1,9 +1,9 @@
 package org.pactDemo.akka
 
 import com.twitter.finagle.Http
-import org.pactDemo.finatraUtilities.GenericCustomClient
+import org.pactDemo.finatra.service.GenericCustomClient
+import org.pactDemo.finatra.utilities.Futures._
 import org.scalatest.{FunSpec, Matchers}
-import org.pactDemo.finatraUtilities.Futures._
 
 class AkkaPactTest extends FunSpec with Matchers {
 

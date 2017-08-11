@@ -1,8 +1,8 @@
 package org.pactDemo.ios
 
-import com.twitter.finagle.http.{Method, Methods, Request, RequestBuilder}
+import com.twitter.finagle.http.{Method, RequestBuilder}
 import com.twitter.io.Buf
-import org.pactDemo.finatraUtilities.{FromRequest, ToRequest}
+import org.pactDemo.finatra.utilities.{FromRequest, ToRequest}
 import org.pactDemo.utilities.PactDemoSpec
 
 class IosProviderRequestSpec extends PactDemoSpec {

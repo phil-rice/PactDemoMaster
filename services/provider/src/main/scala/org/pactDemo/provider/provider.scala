@@ -2,12 +2,14 @@ package org.pactDemo.provider
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala._
-import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
-import org.pactDemo.finatraUtilities._
-import org.pactDemo.mustache.{DisplayStructureController, Mustache, StatusController}
+import org.pactDemo.finatra._
+import org.pactDemo.finatra.controller.{AssetsController, DisplayStructureController, StatusController}
+import org.pactDemo.finatra.structure.{ServiceLanguage, ServiceLanguageExtension}
+import org.pactDemo.finatra.utilities.{FinagleLoggingAdapter, PactArrow, SimpleLogMe}
+import org.pactDemo.mustache.Mustache
 
 
 case class AuthenticationRequestWithPrefixBody(`Authentication-token`: String) {
@@ -103,7 +105,7 @@ object Provider extends App with ServiceLanguage with AuthenticationLanguage {
   implicit val logme = new SimpleLogMe
 
   import Mustache._
-  import org.pactDemo.mustache.DisplayStructure._
+  import org.pactDemo.finatra.controller.DisplayStructure._
 
   val clientBuilder = authenticate >--< logging("AuthenticationService", "")
   new FinatraServer(9000, new StatusController(clientBuilder), new DisplayStructureController(clientBuilder), new ProviderController(clientBuilder.service), new AssetsController).main(Array())

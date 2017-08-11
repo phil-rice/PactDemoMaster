@@ -1,7 +1,7 @@
 package org.pactDemo.ios
 
-import com.twitter.finagle.http.{Response, Status, Statuses}
-import org.pactDemo.finatraUtilities.FromResponse
+import com.twitter.finagle.http.{Response, Status}
+import org.pactDemo.finatra.utilities.FromResponse
 import org.pactDemo.utilities.PactDemoSpec
 
 class IosAuthResponseSpec extends PactDemoSpec {

@@ -2,7 +2,9 @@ package org.pactDemo.android
 
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Status
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, GenericCustomClient, MutableService, NullSl4jLoggingAdapter}
+import org.pactDemo.finatra.service.GenericCustomClient
+import org.pactDemo.finatra.utilities.NullSl4jLoggingAdapter
+import org.pactDemo.finatra.{FinatraControllerSpec, MutableService}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
 
 class AndroidFullPathToPathSpec extends FinatraControllerSpec with BeforeAndAfterAll with BeforeAndAfter {

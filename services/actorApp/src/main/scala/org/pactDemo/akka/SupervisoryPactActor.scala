@@ -4,18 +4,18 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 import akka.actor.{Actor, ActorContext, ActorRef, ActorSystem, Props}
-import akka.util.Timeout
 import akka.pattern.ask
-
-import scala.concurrent.duration._
+import akka.util.Timeout
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Method, Request, Response}
 import com.twitter.util.Future
-import org.pactDemo.finatraUtilities._
+import org.pactDemo.finatra.service.GenericCustomClient
+import org.pactDemo.finatra.utilities.{FromResponse, Json, PactArrow, ToRequest}
+
+import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.concurrent.{Await, ExecutionContext}
 
 
 object Util {

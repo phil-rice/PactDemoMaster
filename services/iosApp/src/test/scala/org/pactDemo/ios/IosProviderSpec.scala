@@ -4,7 +4,8 @@ import com.twitter.finagle.http.Status
 import com.twitter.inject.server.FeatureTestMixin
 import com.twitter.util.Future
 import org.mockito.Mockito._
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, NullSl4jLoggingAdapter}
+import org.pactDemo.finatra.FinatraControllerSpec
+import org.pactDemo.finatra.utilities.NullSl4jLoggingAdapter
 import org.scalatest.BeforeAndAfter
 
 class IosProviderSpec extends FinatraControllerSpec with FeatureTestMixin with BeforeAndAfter {

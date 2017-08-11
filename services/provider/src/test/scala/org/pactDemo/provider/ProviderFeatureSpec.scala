@@ -1,12 +1,11 @@
 package org.pactDemo.provider
 
 import com.twitter.finagle.http.Status
-import com.twitter.finatra.http.{Controller, EmbeddedHttpServer}
+import com.twitter.finatra.http.Controller
 import com.twitter.util.Future
 import org.mockito.Mockito._
-import org.pactDemo.finatraUtilities.{FinatraControllerSpec, FinatraServer}
-import org.pactDemo.utilities.PactDemoSpec
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
+import org.pactDemo.finatra.FinatraControllerSpec
+import org.scalatest.BeforeAndAfter
 
 class ProviderFeatureSpec extends FinatraControllerSpec with BeforeAndAfter {
 

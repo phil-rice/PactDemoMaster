@@ -1,14 +1,15 @@
 package org.pactDemo.ios
 
-import com.twitter.finagle.Http
 import com.twitter.finagle.http.{Method, Request, Response}
 import com.twitter.finatra.http.Controller
 import com.twitter.finatra.http.response.ResponseBuilder
-import com.twitter.finatra.request.RouteParam
 import com.twitter.util.Future
-import org.pactDemo.finatraUtilities.{FinatraServer, _}
-import org.pactDemo.mustache.{DisplayStructureController, Mustache, StatusController}
-import org.pactDemo.utilities.{Heroku, Strings}
+import org.pactDemo.finatra.FinatraServer
+import org.pactDemo.finatra.controller.{AssetsController, DisplayStructureController, StatusController}
+import org.pactDemo.finatra.structure.ServiceLanguage
+import org.pactDemo.finatra.utilities._
+import org.pactDemo.mustache.Mustache
+import org.pactDemo.utilities.{Heroku, Strings, TemplateMaker}
 
 case class AuthToken(`Authentication-token`: String)
 
@@ -78,7 +79,6 @@ object IosAuthResponse extends PactArrow {
 class IosProvider(clientService: IosProviderRequest => Future[IosAuthResponse])(implicit templateMaker: TemplateMaker, loggingAdapter: LoggingAdapter) extends Controller with RequestResponse {
 
   import PactArrow._
-  import Futures._
 
   post("/token/id/:id") { request: Request => request ~> fromRequest[IosProviderRequest] ~> clientService ~> toResponse }
   post("/token/id/:id/debug")(traceClient[IosProviderRequest, IosAuthResponse]("logging.mustache", clientService))
@@ -94,7 +94,7 @@ object IosProvider extends App with ServiceLanguage {
   implicit val logger = new SimpleLogMe
 
   import Mustache._
-  import org.pactDemo.mustache.DisplayStructure._
+  import org.pactDemo.finatra.controller.DisplayStructure._
 
   val baseUrl = Heroku.providerHostAndPort
 

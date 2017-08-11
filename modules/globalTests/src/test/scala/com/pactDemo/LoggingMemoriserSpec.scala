@@ -1,9 +1,10 @@
 package com.pactDemo
 
 import com.twitter.util.{Future, Return, Throw}
-import org.pactDemo.finatraUtilities._
+import org.pactDemo.finatra._
+import org.pactDemo.finatra.utilities._
 import org.pactDemo.utilities.{MockNanoTimeService, PactDemoSpec}
-import Futures._
+import org.pactDemo.finatra.utilities.Futures._
 
 class LoggingMemoriserSpec extends PactDemoSpec {
   val runtimeException = new RuntimeException
